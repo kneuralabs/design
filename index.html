@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Studio — Guidelines + Palette + Typography</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+:root{
+--c1:#0a0a0f;--c2:#13131a;--c3:#1c1c27;--c4:#252535;--c5:#32324a;
+--acc:#7c6dff;--acc2:#a78bfa;--acc3:#c4b5fd;
+--txt1:#f0eff8;--txt2:#b8b6cc;--txt3:#7a7890;
+--gold:#d4a853;--rose:#e8758a;--teal:#4ecdc4;
+--r:12px;--r2:20px;--r3:6px;
+--shadow:0 4px 24px rgba(0,0,0,.4);
+--shadow2:0 2px 12px rgba(0,0,0,.25);
+font-size:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--c1);color:var(--txt1);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--c2)}
+::-webkit-scrollbar-thumb{background:var(--c5);border-radius:2px}
+
+/* Layout */
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+@media(max-width:768px){.app{grid-template-columns:1fr;grid-template-rows:auto 1fr}}
+
+/* Sidebar */
+.sidebar{background:var(--c2);border-right:1px solid var(--c4);padding:0;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:100}
+@media(max-width:768px){.sidebar{position:fixed;bottom:0;top:auto;width:100%;height:auto;border-right:none;border-top:1px solid var(--c4);overflow-y:visible;z-index:200}}
+.logo{padding:20px 20px 16px;border-bottom:1px solid var(--c4)}
+.logo h1{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:var(--txt1);letter-spacing:-.3px}
+.logo span{font-size:10px;color:var(--acc2);letter-spacing:1.5px;text-transform:uppercase;font-weight:500}
+.nav{padding:12px 0}
+@media(max-width:768px){.nav{display:flex;overflow-x:auto;padding:0;gap:0}}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;transition:all .2s;color:var(--txt2);font-size:13px;font-weight:500;border-left:2px solid transparent;white-space:nowrap}
+@media(max-width:768px){.nav-item{padding:12px 16px;border-left:none;border-top:2px solid transparent;flex-direction:column;gap:3px;font-size:11px}}
+.nav-item:hover{color:var(--txt1);background:var(--c3)}
+.nav-item.active{color:var(--acc2);background:rgba(124,109,255,.1);border-left-color:var(--acc)}
+@media(max-width:768px){.nav-item.active{border-left:none;border-top-color:var(--acc)}}
+.nav-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:16px}
+
+/* Main */
+.main{background:var(--c1);overflow-y:auto;padding-bottom:80px}
+@media(max-width:768px){.main{padding-bottom:120px}}
+.section{display:none;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Page Header */
+.page-head{padding:32px 32px 24px;border-bottom:1px solid var(--c3)}
+@media(max-width:768px){.page-head{padding:20px 16px 16px}}
+.page-head h2{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;color:var(--txt1);margin-bottom:4px}
+.page-head p{font-size:13px;color:var(--txt3)}
+.content-wrap{padding:28px 32px}
+@media(max-width:768px){.content-wrap{padding:16px}}
+
+/* Cards */
+.card{background:var(--c2);border:1px solid var(--c4);border-radius:var(--r);padding:20px;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:600;color:var(--txt2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';width:3px;height:14px;background:var(--acc);border-radius:2px}
+
+/* Grid helpers */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:1024px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+
+/* Inputs */
+label{display:block;font-size:12px;color:var(--txt3);margin-bottom:5px;font-weight:500}
+input[type=text],input[type=color],select,textarea{width:100%;background:var(--c3);border:1px solid var(--c4);border-radius:var(--r3);color:var(--txt1);font-family:'Inter',sans-serif;font-size:13px;padding:9px 12px;transition:border-color .2s;outline:none}
+input[type=text]:focus,select:focus,textarea:focus{border-color:var(--acc)}
+input[type=color]{height:42px;padding:4px 6px;cursor:pointer}
+select option{background:var(--c3)}
+textarea{resize:vertical;min-height:80px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--r3);border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;transition:all .2s;letter-spacing:.2px}
+.btn-primary{background:var(--acc);color:#fff}
+.btn-primary:hover{background:#6a5ce8;transform:translateY(-1px);box-shadow:0 4px 16px rgba(124,109,255,.4)}
+.btn-secondary{background:var(--c3);color:var(--txt2);border:1px solid var(--c4)}
+.btn-secondary:hover{background:var(--c4);color:var(--txt1)}
+.btn-ghost{background:transparent;color:var(--acc2);border:1px solid var(--c4)}
+.btn-ghost:hover{border-color:var(--acc);background:rgba(124,109,255,.08)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+
+/* Tags / Pills */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid var(--c4);color:var(--txt2)}
+.pill.active,.pill:hover{background:rgba(124,109,255,.15);border-color:var(--acc2);color:var(--acc2)}
+.pill-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+
+/* Color swatch */
+.swatch{width:100%;height:56px;border-radius:var(--r3);cursor:pointer;position:relative;border:1px solid var(--c4);transition:transform .2s}
+.swatch:hover{transform:scale(1.04)}
+.swatch-label{font-size:10px;color:var(--txt3);margin-top:4px;text-align:center}
+.swatch-wrap{text-align:center}
+
+/* Palette row */
+.palette-row{display:flex;gap:0;border-radius:var(--r);overflow:hidden;height:64px;border:1px solid var(--c4)}
+.palette-chip{flex:1;cursor:pointer;transition:flex .3s}
+.palette-chip:hover{flex:2}
+
+/* Score bar */
+.score-bar{background:var(--c3);border-radius:20px;height:6px;margin-top:6px;overflow:hidden}
+.score-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .8s cubic-bezier(.4,0,.2,1)}
+
+/* Font preview */
+.font-preview-box{background:var(--c3);border:1px solid var(--c4);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;position:relative}
+.font-preview-box:hover{border-color:var(--acc);transform:translateY(-2px)}
+.font-preview-box.selected{border-color:var(--acc);background:rgba(124,109,255,.08)}
+.font-preview-box .check{position:absolute;top:10px;right:10px;width:18px;height:18px;background:var(--acc);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px}
+.font-preview-box.selected .check{display:flex}
+.fp-name{font-size:11px;color:var(--txt3);margin-bottom:6px;font-weight:500}
+.fp-sample{font-size:20px;font-weight:600;color:var(--txt1);line-height:1.2}
+.fp-meta{font-size:10px;color:var(--txt3);margin-top:5px}
+
+/* Brand preview mockup */
+.brand-mockup{background:var(--c3);border:1px solid var(--c4);border-radius:var(--r2);overflow:hidden}
+.mockup-bar{height:32px;background:var(--c4);display:flex;align-items:center;gap:6px;padding:0 12px}
+.mock-dot{width:10px;height:10px;border-radius:50%}
+.mockup-content{padding:24px}
+
+/* Comparison columns */
+.compare-col{background:var(--c3);border:1px solid var(--c4);border-radius:var(--r);padding:16px;text-align:center}
+.compare-col.winner{border-color:var(--acc);background:rgba(124,109,255,.06)}
+.compare-badge{background:var(--acc);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.5px;margin-bottom:8px;display:inline-block}
+
+/* Export code */
+.code-block{background:#0d0d14;border:1px solid var(--c4);border-radius:var(--r3);padding:16px;font-family:'IBM Plex Sans',monospace;font-size:12px;color:#a8d8a8;overflow-x:auto;white-space:pre;line-height:1.7;max-height:240px}
+
+/* Toggle */
+.toggle-row{display:flex;gap:4px;background:var(--c3);border-radius:var(--r3);padding:3px;width:fit-content;margin-bottom:16px}
+.toggle-btn{padding:6px 14px;border-radius:4px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;color:var(--txt2);background:transparent;transition:all .2s}
+.toggle-btn.active{background:var(--acc);color:#fff}
+
+/* Tabs */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--c4);margin-bottom:20px}
+.tab{padding:10px 16px;cursor:pointer;font-size:13px;font-weight:500;color:var(--txt3);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.tab.active{color:var(--acc2);border-bottom-color:var(--acc)}
+.tab:hover{color:var(--txt1)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* Progress ring */
+.ring-wrap{display:flex;align-items:center;gap:12px}
+.ring-score{font-size:28px;font-weight:700;font-family:'Space Grotesk',sans-serif;color:var(--txt1)}
+.ring-label{font-size:12px;color:var(--txt3)}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--c3);border:1px solid var(--acc2);border-radius:var(--r);padding:12px 18px;font-size:13px;color:var(--txt1);z-index:9999;transform:translateY(60px);opacity:0;transition:all .3s;max-width:260px}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* Hero brand preview */
+.hero-prev{border-radius:var(--r2);overflow:hidden;border:1px solid var(--c4)}
+.hp-nav{height:48px;display:flex;align-items:center;padding:0 20px;gap:16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.hp-body{padding:32px 20px}
+.hp-hero{margin-bottom:24px}
+.hp-tagline{font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;opacity:.6}
+.hp-title{font-size:36px;font-weight:700;line-height:1.15;margin-bottom:12px}
+.hp-desc{font-size:14px;line-height:1.6;opacity:.7;max-width:480px;margin-bottom:20px}
+.hp-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+
+/* Responsive font sizes */
+@media(max-width:600px){.hp-title{font-size:24px}.hp-desc{font-size:13px}}
+
+/* Personality traits */
+.trait{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid var(--c4);color:var(--txt2);margin:3px}
+.trait.on{color:var(--txt1);border-color:currentColor}
+
+/* Font scale table */
+.scale-row{display:flex;align-items:baseline;gap:16px;padding:10px 0;border-bottom:1px solid var(--c3)}
+.scale-size{font-size:11px;color:var(--txt3);min-width:64px}
+.scale-name{font-size:11px;color:var(--txt3);min-width:80px}
+
+/* Health meter */
+.health-item{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--c3)}
+.health-label{font-size:13px;color:var(--txt2);flex:1}
+.health-score{font-size:13px;font-weight:600;min-width:32px;text-align:right}
+
+/* Gradient animated bg for hero */
+.grad-bg{background:linear-gradient(135deg,var(--bg-a,#0a0a1a) 0%,var(--bg-b,#1a0a2e) 50%,var(--bg-c,#0a1a2e) 100%)}
+
+/* Notification dot */
+.n-dot{width:6px;height:6px;background:var(--acc);border-radius:50%;display:inline-block;margin-left:5px}
+
+/* Section divider */
+.divider{height:1px;background:var(--c3);margin:20px 0}
+
+/* Accessibility chip */
+.a11y-chip{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.5px}
+.a11y-pass{background:rgba(78,205,196,.15);color:var(--teal)}
+.a11y-warn{background:rgba(212,168,83,.15);color:var(--gold)}
+.a11y-fail{background:rgba(232,117,138,.15);color:var(--rose)}
+
+/* Font card for library */
+.font-card{background:var(--c2);border:1px solid var(--c4);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;position:relative}
+.font-card:hover{border-color:var(--acc2);transform:translateY(-2px);box-shadow:var(--shadow2)}
+.font-card.active{border-color:var(--acc);background:rgba(124,109,255,.07)}
+.fc-cat{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--acc2);margin-bottom:6px}
+.fc-name{font-size:12px;color:var(--txt2);margin-bottom:10px;font-weight:500}
+.fc-sample{font-size:26px;font-weight:600;color:var(--txt1);line-height:1.1}
+.fc-tag{font-size:9px;color:var(--txt3);margin-top:8px}
+
+/* Floating label input */
+.input-group{position:relative;margin-bottom:14px}
+
+/* Scroll fade edges */
+.scroll-fade{position:relative;overflow:hidden}
+
+/* AI chip */
+.ai-chip{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(124,109,255,.2),rgba(167,139,250,.1));border:1px solid rgba(167,139,250,.3);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--acc2);font-weight:500;margin-bottom:10px}
+
+/* Live indicator */
+.live-dot{width:6px;height:6px;background:#4ade80;border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Smooth hover on swatches */
+.h-swatch{width:36px;height:36px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .2s;display:inline-block}
+.h-swatch:hover{transform:scale(1.2);border-color:var(--txt1)}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="logo">
+    <h1>Design Studio</h1>
+    <span>Professional Suite</span>
+  </div>
+  <nav class="nav">
+    <div class="nav-item active" data-sec="brand" onclick="showSection('brand',this)">
+      <span class="nav-icon">◈</span><span>Brand Identity</span>
+    </div>
+    <div class="nav-item" data-sec="palette" onclick="showSection('palette',this)">
+      <span class="nav-icon">◉</span><span>Palette Fixer</span>
+    </div>
+    <div class="nav-item" data-sec="typography" onclick="showSection('typography',this)">
+      <span class="nav-icon">Aa</span><span>Typography</span>
+    </div>
+    <div class="nav-item" data-sec="preview" onclick="showSection('preview',this)">
+      <span class="nav-icon">▣</span><span>Live Preview</span>
+    </div>
+    <div class="nav-item" data-sec="export" onclick="showSection('export',this)">
+      <span class="nav-icon">↑</span><span>Export</span>
+    </div>
+  </nav>
+</aside>
+
+<!-- Main Content -->
+<main class="main">
+
+<!-- ─── BRAND IDENTITY ─── -->
+<section class="section active" id="sec-brand">
+  <div class="page-head">
+    <h2>Brand Identity</h2>
+    <p>Define your brand's DNA — name, personality, and visual direction</p>
+  </div>
+  <div class="content-wrap">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Brand Basics</div>
+        <div class="input-group">
+          <label>Brand Name</label>
+          <input type="text" id="brandName" placeholder="e.g. Lumina" oninput="syncBrand()">
+        </div>
+        <div class="input-group">
+          <label>Tagline</label>
+          <input type="text" id="brandTagline" placeholder="e.g. Illuminate your world" oninput="syncBrand()">
+        </div>
+        <div class="input-group">
+          <label>Industry</label>
+          <select id="brandIndustry" onchange="autoRecommend()">
+            <option value="">Select industry</option>
+            <option value="technology">Technology</option>
+            <option value="luxury">Luxury & Fashion</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="finance">Finance</option>
+            <option value="education">Education</option>
+            <option value="startup">Startup</option>
+            <option value="creative">Creative & Media</option>
+            <option value="corporate">Corporate</option>
+            <option value="retail">Retail</option>
+            <option value="food">Food & Beverage</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Brand Description</label>
+          <textarea id="brandDesc" placeholder="What does your brand do? Who is your audience?" oninput="syncBrand()"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Brand Personality</div>
+        <p style="font-size:12px;color:var(--txt3);margin-bottom:10px">Select traits that define your brand voice:</p>
+        <div id="traitsWrap">
+          <!-- filled by JS -->
+        </div>
+        <div class="divider"></div>
+        <div class="card-title" style="margin-bottom:10px">Brand Archetype</div>
+        <select id="archetype" onchange="autoRecommend()">
+          <option value="">Choose archetype</option>
+          <option value="hero">Hero — Bold, courageous, transformative</option>
+          <option value="sage">Sage — Wise, trusted, knowledgeable</option>
+          <option value="creator">Creator — Innovative, artistic, expressive</option>
+          <option value="ruler">Ruler — Premium, authoritative, refined</option>
+          <option value="magician">Magician — Transformative, visionary, inspiring</option>
+          <option value="jester">Jester — Playful, fun, spontaneous</option>
+          <option value="caregiver">Caregiver — Nurturing, warm, supportive</option>
+          <option value="explorer">Explorer — Adventurous, free, pioneering</option>
+          <option value="lover">Lover — Passionate, intimate, warm</option>
+          <option value="innocent">Innocent — Pure, simple, optimistic</option>
+        </select>
+        <div id="archetypeDesc" style="margin-top:10px;font-size:12px;color:var(--txt3);min-height:32px;padding:8px;background:var(--c3);border-radius:var(--r3);display:none"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Primary Brand Colors</div>
+      <div class="grid-4">
+        <div>
+          <label>Primary</label>
+          <input type="color" id="cprimary" value="#7c6dff" onchange="updateColors()">
+        </div>
+        <div>
+          <label>Secondary</label>
+          <input type="color" id="csecondary" value="#4ecdc4" onchange="updateColors()">
+        </div>
+        <div>
+          <label>Accent</label>
+          <input type="color" id="caccent" value="#d4a853" onchange="updateColors()">
+        </div>
+        <div>
+          <label>Background</label>
+          <input type="color" id="cbg" value="#0a0a0f" onchange="updateColors()">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="autoRecommend()">✦ Auto-Recommend</button>
+        <button class="btn btn-ghost btn-sm" onclick="generateGuidelines()">Generate Guidelines</button>
+      </div>
+    </div>
+
+    <div id="guidelineOutput" style="display:none">
+      <div class="card">
+        <div class="card-title">Generated Brand Guidelines</div>
+        <div id="guidelineContent"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PALETTE FIXER ─── -->
+<section class="section" id="sec-palette">
+  <div class="page-head">
+    <h2>Palette Fixer</h2>
+    <p>Create, analyze, fix and optimize color palettes for your brand</p>
+  </div>
+  <div class="content-wrap">
+    <div class="tabs" id="paletteTabs">
+      <div class="tab active" onclick="switchTab('paletteTabs','palPanel',0,this)">Generate</div>
+      <div class="tab" onclick="switchTab('paletteTabs','palPanel',1,this)">Fix & Analyze</div>
+      <div class="tab" onclick="switchTab('paletteTabs','palPanel',2,this)">Harmonies</div>
+      <div class="tab" onclick="switchTab('paletteTabs','palPanel',3,this)">Accessibility</div>
+    </div>
+
+    <div class="tab-panel active" id="palPanel0">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Generate Palette</div>
+          <div class="input-group">
+            <label>Palette Style</label>
+            <select id="palStyle" onchange="generatePalette()">
+              <option value="professional">Professional</option>
+              <option value="vibrant">Vibrant</option>
+              <option value="muted">Muted & Elegant</option>
+              <option value="dark">Dark Mode</option>
+              <option value="pastel">Pastel Soft</option>
+              <option value="monochrome">Monochrome</option>
+              <option value="earthy">Earthy Natural</option>
+              <option value="neon">Neon Futuristic</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Base Hue</label>
+            <input type="color" id="baseHue" value="#7c6dff" onchange="generatePalette()">
+          </div>
+          <div class="input-group">
+            <label>Number of Colors</label>
+            <select id="palCount" onchange="generatePalette()">
+              <option value="3">3 colors</option>
+              <option value="5" selected>5 colors</option>
+              <option value="7">7 colors</option>
+              <option value="9">9 colors</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="generatePalette()">⟳ Generate New</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Generated Palette</div>
+          <div id="paletteDisplay"></div>
+          <div class="palette-row" id="paletteStrip" style="margin-top:12px"></div>
+          <div style="margin-top:12px;font-size:12px;color:var(--txt3)" id="paletteMeta"></div>
+          <div class="btn-row">
+            <button class="btn btn-ghost btn-sm" onclick="copyPaletteCSS()">Copy CSS</button>
+            <button class="btn btn-ghost btn-sm" onclick="applyToBrand()">Apply to Brand</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="palPanel1">
+      <div class="card">
+        <div class="card-title">Color Health Analysis</div>
+        <p style="font-size:12px;color:var(--txt3);margin-bottom:14px">Paste your hex colors or enter them below to get a fix report:</p>
+        <div id="fixInputs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"></div>
+        <button class="btn btn-ghost btn-sm" onclick="addFixColor()">+ Add Color</button>
+        <button class="btn btn-primary btn-sm" onclick="analyzeColors()" style="margin-left:8px">Analyze & Fix</button>
+        <div id="fixReport" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="palPanel2">
+      <div class="card">
+        <div class="card-title">Color Harmonies</div>
+        <div class="grid-2">
+          <div>
+            <label>Root Color</label>
+            <input type="color" id="harmonyRoot" value="#7c6dff" onchange="generateHarmonies()">
+          </div>
+          <div>
+            <label>Harmony Type</label>
+            <select id="harmonyType" onchange="generateHarmonies()">
+              <option value="complementary">Complementary</option>
+              <option value="triadic">Triadic</option>
+              <option value="analogous">Analogous</option>
+              <option value="split">Split Complementary</option>
+              <option value="tetradic">Tetradic</option>
+              <option value="square">Square</option>
+            </select>
+          </div>
+        </div>
+        <div id="harmoniesDisplay" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="palPanel3">
+      <div class="card">
+        <div class="card-title">WCAG Accessibility Checker</div>
+        <div class="grid-2">
+          <div>
+            <label>Foreground Color</label>
+            <input type="color" id="fg" value="#ffffff" onchange="checkContrast()">
+          </div>
+          <div>
+            <label>Background Color</label>
+            <input type="color" id="bg" value="#0a0a0f" onchange="checkContrast()">
+          </div>
+        </div>
+        <div id="contrastResult" style="margin-top:14px"></div>
+        <div class="divider"></div>
+        <div class="card-title" style="margin-bottom:10px">Batch Check</div>
+        <div id="batchContrast"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TYPOGRAPHY ─── -->
+<section class="section" id="sec-typography">
+  <div class="page-head">
+    <h2>Typography Intelligence</h2>
+    <p>Discover, pair, and evaluate professional font systems</p>
+  </div>
+  <div class="content-wrap">
+    <div class="tabs" id="typeTabs">
+      <div class="tab active" onclick="switchTab('typeTabs','typePanel',0,this)">Font Library</div>
+      <div class="tab" onclick="switchTab('typeTabs','typePanel',1,this)">Smart Pairing</div>
+      <div class="tab" onclick="switchTab('typeTabs','typePanel',2,this)">Preview</div>
+      <div class="tab" onclick="switchTab('typeTabs','typePanel',3,this)">Health Score</div>
+      <div class="tab" onclick="switchTab('typeTabs','typePanel',4,this)">Design System</div>
+    </div>
+
+    <!-- Font Library -->
+    <div class="tab-panel active" id="typePanel0">
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <select id="fontCatFilter" onchange="renderFontLibrary()">
+          <option value="">All Categories</option>
+          <option value="Sans Serif">Sans Serif</option>
+          <option value="Serif">Serif</option>
+          <option value="Display">Display</option>
+          <option value="Monospace">Monospace</option>
+        </select>
+        <select id="fontIndustryFilter" onchange="renderFontLibrary()">
+          <option value="">All Industries</option>
+          <option value="Technology">Technology</option>
+          <option value="Luxury">Luxury</option>
+          <option value="Corporate">Corporate</option>
+          <option value="Creative">Creative</option>
+          <option value="Editorial">Editorial</option>
+          <option value="Startup">Startup</option>
+          <option value="Healthcare">Healthcare</option>
+          <option value="Finance">Finance</option>
+          <option value="Education">Education</option>
+          <option value="Fashion">Fashion</option>
+        </select>
+      </div>
+      <div class="grid-4" id="fontLibGrid"></div>
+    </div>
+
+    <!-- Smart Pairing -->
+    <div class="tab-panel" id="typePanel1">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Personality Matcher</div>
+          <p style="font-size:12px;color:var(--txt3);margin-bottom:10px">Select brand personality to get matching font pairs:</p>
+          <div id="fontTraitsWrap"></div>
+          <div class="divider"></div>
+          <div class="card-title" style="margin-bottom:8px">Or choose industry</div>
+          <select id="pairingIndustry" onchange="suggestPairings()">
+            <option value="">Select industry</option>
+            <option value="technology">Technology</option>
+            <option value="luxury">Luxury & Fashion</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="finance">Finance</option>
+            <option value="education">Education</option>
+            <option value="startup">Startup</option>
+            <option value="creative">Creative</option>
+            <option value="corporate">Corporate</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="card-title">Recommended Pairings</div>
+          <div id="pairingResults"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:0">
+        <div class="card-title">Manual Selection</div>
+        <div class="grid-3">
+          <div>
+            <label>Heading Font</label>
+            <select id="selHeading" onchange="updateTypoPrev()"></select>
+          </div>
+          <div>
+            <label>Body Font</label>
+            <select id="selBody" onchange="updateTypoPrev()"></select>
+          </div>
+          <div>
+            <label>UI / Mono Font</label>
+            <select id="selUI" onchange="updateTypoPrev()"></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="tab-panel" id="typePanel2">
+      <div class="toggle-row" id="prevToggle">
+        <button class="toggle-btn active" onclick="switchPrevMode('website',this)">Website</button>
+        <button class="toggle-btn" onclick="switchPrevMode('card',this)">Business Card</button>
+        <button class="toggle-btn" onclick="switchPrevMode('social',this)">Social Post</button>
+        <button class="toggle-btn" onclick="switchPrevMode('app',this)">App UI</button>
+      </div>
+      <div id="typographyPreview"></div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">Side-by-Side Comparison</div>
+        <div class="grid-3" id="compareGrid"></div>
+      </div>
+    </div>
+
+    <!-- Health Score -->
+    <div class="tab-panel" id="typePanel3">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Typography Health Score</div>
+          <div id="healthScore"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Accessibility Analysis</div>
+          <div id="a11yAnalysis"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">AI Typography Advisor</div>
+        <div id="aiAdvisor"></div>
+      </div>
+    </div>
+
+    <!-- Design System -->
+    <div class="tab-panel" id="typePanel4">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Type Scale</div>
+          <div id="typeScale"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">System Specifications</div>
+          <div id="typeSpecs"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Responsive Typography Rules</div>
+        <div id="respTypo"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── LIVE PREVIEW ─── -->
+<section class="section" id="sec-preview">
+  <div class="page-head">
+    <h2>Live Brand Preview <span class="live-dot" style="display:inline-block;margin-left:8px;vertical-align:middle"></span></h2>
+    <p>See your brand system come alive across all touchpoints</p>
+  </div>
+  <div class="content-wrap">
+    <div class="toggle-row">
+      <button class="toggle-btn active" onclick="switchLivePrev('website',this)">Website</button>
+      <button class="toggle-btn" onclick="switchLivePrev('app',this)">App</button>
+      <button class="toggle-btn" onclick="switchLivePrev('social',this)">Social</button>
+      <button class="toggle-btn" onclick="switchLivePrev('pres',this)">Presentation</button>
+    </div>
+    <div id="livePreviewWrap"></div>
+  </div>
+</section>
+
+<!-- ─── EXPORT ─── -->
+<section class="section" id="sec-export">
+  <div class="page-head">
+    <h2>Export Brand System</h2>
+    <p>Generate production-ready code, tokens, and specifications</p>
+  </div>
+  <div class="content-wrap">
+    <div class="tabs" id="expTabs">
+      <div class="tab active" onclick="switchTab('expTabs','expPanel',0,this)">CSS Variables</div>
+      <div class="tab" onclick="switchTab('expTabs','expPanel',1,this)">Tailwind Config</div>
+      <div class="tab" onclick="switchTab('expTabs','expPanel',2,this)">Design Tokens</div>
+      <div class="tab" onclick="switchTab('expTabs','expPanel',3,this)">Figma Tokens</div>
+    </div>
+    <div class="tab-panel active" id="expPanel0">
+      <div class="card">
+        <div class="card-title">CSS Custom Properties</div>
+        <pre class="code-block" id="cssExport"></pre>
+        <div class="btn-row">
+          <button class="btn btn-primary btn-sm" onclick="copyExport('cssExport')">Copy CSS</button>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="expPanel1">
+      <div class="card">
+        <div class="card-title">Tailwind Configuration</div>
+        <pre class="code-block" id="tailwindExport"></pre>
+        <div class="btn-row">
+          <button class="btn btn-primary btn-sm" onclick="copyExport('tailwindExport')">Copy Config</button>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="expPanel2">
+      <div class="card">
+        <div class="card-title">Design Tokens (JSON)</div>
+        <pre class="code-block" id="tokensExport"></pre>
+        <div class="btn-row">
+          <button class="btn btn-primary btn-sm" onclick="copyExport('tokensExport')">Copy Tokens</button>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="expPanel3">
+      <div class="card">
+        <div class="card-title">Figma-Compatible Tokens</div>
+        <pre class="code-block" id="figmaExport"></pre>
+        <div class="btn-row">
+          <button class="btn btn-primary btn-sm" onclick="copyExport('figmaExport')">Copy Figma Tokens</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA STORE
+// ═══════════════════════════════════════════════════════
+const BS = {
+  name: 'Lumina',
+  tagline: 'Illuminate your world',
+  industry: 'technology',
+  traits: [],
+  archetype: '',
+  colors: { primary:'#7c6dff', secondary:'#4ecdc4', accent:'#d4a853', bg:'#0a0a0f', text:'#f0eff8' },
+  fonts: { heading:'Space Grotesk', body:'Inter', ui:'IBM Plex Sans' },
+  palette: [],
+};
+
+const FONT_DB = [
+  {name:'Space Grotesk',cat:'Sans Serif',tags:['Technology','Startup','Modern'],desc:'Geometric sans with character',css:"'Space Grotesk',sans-serif",sample:'Brand Vision'},
+  {name:'Inter',cat:'Sans Serif',tags:['Corporate','Technology','Healthcare','Finance'],desc:'Highly readable UI font',css:"'Inter',sans-serif",sample:'Clean & Clear'},
+  {name:'Manrope',cat:'Sans Serif',tags:['Startup','Creative','Education'],desc:'Elegant rounded sans-serif',css:"'Manrope',sans-serif",sample:'Modern & Fresh'},
+  {name:'DM Sans',cat:'Sans Serif',tags:['Startup','Creative','Fashion'],desc:'Low-contrast geometric',css:"'DM Sans',sans-serif",sample:'Effortless Design'},
+  {name:'Plus Jakarta Sans',cat:'Sans Serif',tags:['Corporate','Technology','Finance'],desc:'Contemporary corporate feel',css:"'Plus Jakarta Sans',sans-serif",sample:'Professional Grade'},
+  {name:'Sora',cat:'Sans Serif',tags:['Creative','Startup','Technology'],desc:'Futuristic and distinctive',css:"'Sora',sans-serif",sample:'Future Forward'},
+  {name:'Playfair Display',cat:'Serif',tags:['Luxury','Editorial','Fashion'],desc:'High-contrast editorial serif',css:"'Playfair Display',serif",sample:'Timeless Luxury'},
+  {name:'Merriweather',cat:'Serif',tags:['Education','Corporate','Healthcare'],desc:'Screen-optimized serif',css:"'Merriweather',serif",sample:'Trusted & Warm'},
+  {name:'Source Serif 4',cat:'Serif',tags:['Education','Finance','Corporate'],desc:'Versatile news serif',css:"'Source Serif 4',serif",sample:'Credible & Clear'},
+  {name:'Cormorant Garamond',cat:'Serif',tags:['Luxury','Fashion','Creative'],desc:'Ultra-elegant fashion serif',css:"'Cormorant Garamond',serif",sample:'Pure Elegance'},
+  {name:'Libre Baskerville',cat:'Serif',tags:['Education','Healthcare','Corporate'],desc:'Classic, authoritative serif',css:"'Libre Baskerville',serif",sample:'Knowledge & Trust'},
+  {name:'Fraunces',cat:'Display',tags:['Creative','Editorial','Fashion'],desc:'Optical size variable display',css:"'Fraunces',serif",sample:'Poetic Craft'},
+  {name:'IBM Plex Sans',cat:'Sans Serif',tags:['Technology','Finance','Corporate'],desc:'IBM corporate system font',css:"'IBM Plex Sans',sans-serif",sample:'Logic Meets Design'},
+  {name:'IBM Plex Serif',cat:'Serif',tags:['Technology','Finance','Corporate'],desc:'Technical editorial serif',css:"'IBM Plex Serif',serif",sample:'Structure & Form'},
+];
+
+const PAIRS = [
+  {h:'Space Grotesk',b:'Inter',ui:'IBM Plex Sans',label:'Tech Forward',desc:'Clean geometric heading with highly legible body',industries:['technology','startup'],traits:['innovative','technical','minimalist']},
+  {h:'Playfair Display',b:'Inter',ui:'Inter',label:'Premium Editorial',desc:'High-contrast luxury serif paired with neutral body',industries:['luxury','fashion'],traits:['elegant','premium','creative']},
+  {h:'Manrope',b:'Source Serif 4',ui:'Manrope',label:'Startup Refined',desc:'Friendly geometric heading with authoritative body',industries:['startup','education'],traits:['friendly','trustworthy','playful']},
+  {h:'Cormorant Garamond',b:'Manrope',ui:'DM Sans',label:'Fashion House',desc:'Ultra-refined display with modern body type',industries:['luxury','creative','fashion'],traits:['elegant','bold','creative']},
+  {h:'IBM Plex Sans',b:'IBM Plex Serif',ui:'IBM Plex Sans',label:'Enterprise System',desc:'Systematic IBM family for complete consistency',industries:['finance','corporate','technology'],traits:['trustworthy','technical','minimalist']},
+  {h:'Fraunces',b:'DM Sans',ui:'Inter',label:'Editorial Bold',desc:'Expressive optical display with light geometric body',industries:['creative','editorial'],traits:['creative','bold','playful']},
+  {h:'Plus Jakarta Sans',b:'Merriweather',ui:'Inter',label:'Corporate Trust',desc:'Modern corporate heading with warm readable body',industries:['finance','healthcare','corporate'],traits:['trustworthy','premium','minimalist']},
+  {h:'Sora',b:'Manrope',ui:'Space Grotesk',label:'Future Brand',desc:'Futuristic heading with rounded harmonious body',industries:['startup','technology'],traits:['innovative','bold','technical']},
+];
+
+const TRAITS = ['Premium','Trustworthy','Innovative','Playful','Elegant','Technical','Friendly','Minimalist','Bold','Creative','Warm','Professional'];
+const TRAIT_COLORS = {Premium:'#d4a853',Trustworthy:'#4ecdc4',Innovative:'#7c6dff',Playful:'#e8758a',Elegant:'#a78bfa',Technical:'#60a5fa',Friendly:'#86efac',Minimalist:'#94a3b8',Bold:'#f87171',Creative:'#fb923c',Warm:'#fbbf24',Professional:'#818cf8'};
+const ARCHETYPE_DESCS = {
+  hero:'Your brand is courageous, determined and inspired. It challenges, motivates and empowers people to achieve extraordinary things.',
+  sage:'Your brand is the trusted expert. Thoughtful, knowledgeable, and credible — it guides people toward insight and understanding.',
+  creator:'Your brand values imagination and self-expression. It creates things of enduring value and encourages creativity.',
+  ruler:'Your brand commands premium positioning. It signals status, quality, and control — projecting authority and refinement.',
+  magician:'Your brand makes dreams real. Transformative, visionary, it creates moments of wonder and delivers on bold promises.',
+  jester:'Your brand brings joy, humor and fun. Light-hearted, spontaneous and playful — it makes every interaction delightful.',
+  caregiver:'Your brand protects and nurtures. Generous, caring and empathetic — it builds deep human connections.',
+  explorer:'Your brand is freedom-seeking and adventurous. It pushes boundaries and champions independent thinking.',
+  lover:'Your brand creates intimacy and desire. Passionate, sensual, warm — it makes people feel deeply connected.',
+  innocent:'Your brand promises happiness and simplicity. Optimistic, pure, and trustworthy — it delivers consistent delight.'
+};
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showSection(id, el) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='preview') renderLivePreview('website');
+  if(id==='export') buildExports();
+}
+
+function switchTab(tabGroup, panelPrefix, idx, el) {
+  const tabs = document.getElementById(tabGroup).querySelectorAll('.tab');
+  tabs.forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const count = document.querySelectorAll('[id^="'+panelPrefix+'"]').length;
+  for(let i=0;i<count;i++){
+    const p = document.getElementById(panelPrefix+i);
+    if(p) p.classList.toggle('active',i===idx);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+function init() {
+  renderTraits('traitsWrap',BS.traits,onTraitToggle);
+  renderTraits('fontTraitsWrap',BS.traits,onFontTraitToggle);
+  renderFontLibrary();
+  populateFontSelects();
+  generatePalette();
+  generateHarmonies();
+  initFixColors();
+  checkContrast();
+  renderTypoPreview('website');
+  renderCompare();
+  renderHealthScore();
+  renderA11y();
+  renderAIAdvisor();
+  renderTypeScale();
+  suggestPairings();
+  renderLivePreview('website');
+  buildExports();
+}
+
+function renderTraits(wrId, active, cb) {
+  const wrap = document.getElementById(wrId);
+  if(!wrap) return;
+  wrap.innerHTML = TRAITS.map(t=>`
+    <span class="trait ${active.includes(t)?'on':''}" 
+      style="${active.includes(t)?'color:'+TRAIT_COLORS[t]+';border-color:'+TRAIT_COLORS[t]:''}" 
+      onclick="(${cb.toString()})(this,'${t}')" data-trait="${t}">${t}</span>
+  `).join('');
+}
+
+function onTraitToggle(el, t) {
+  const i = BS.traits.indexOf(t);
+  if(i>-1) BS.traits.splice(i,1); else BS.traits.push(t);
+  el.classList.toggle('on');
+  if(BS.traits.includes(t)){el.style.color=TRAIT_COLORS[t];el.style.borderColor=TRAIT_COLORS[t];}
+  else{el.style.color='';el.style.borderColor='';}
+  suggestPairings();
+  autoRecommend();
+}
+
+function onFontTraitToggle(el, t) {
+  const i = BS.traits.indexOf(t);
+  if(i>-1) BS.traits.splice(i,1); else BS.traits.push(t);
+  el.classList.toggle('on');
+  if(BS.traits.includes(t)){el.style.color=TRAIT_COLORS[t];el.style.borderColor=TRAIT_COLORS[t];}
+  else{el.style.color='';el.style.borderColor='';}
+  suggestPairings();
+}
+
+// ═══════════════════════════════════════════════════════
+// BRAND
+// ═══════════════════════════════════════════════════════
+function syncBrand() {
+  BS.name = document.getElementById('brandName').value || 'Lumina';
+  BS.tagline = document.getElementById('brandTagline').value || 'Illuminate your world';
+}
+
+document.getElementById('brandIndustry').addEventListener('change', function(){
+  BS.industry = this.value;
+  autoRecommend();
+});
+
+document.getElementById('archetype').addEventListener('change', function(){
+  BS.archetype = this.value;
+  const d = document.getElementById('archetypeDesc');
+  if(this.value && ARCHETYPE_DESCS[this.value]){
+    d.style.display='block';
+    d.textContent = ARCHETYPE_DESCS[this.value];
+  } else d.style.display='none';
+  autoRecommend();
+});
+
+function updateColors() {
+  BS.colors.primary = document.getElementById('cprimary').value;
+  BS.colors.secondary = document.getElementById('csecondary').value;
+  BS.colors.accent = document.getElementById('caccent').value;
+  BS.colors.bg = document.getElementById('cbg').value;
+}
+
+function autoRecommend() {
+  updateColors();
+  suggestPairings();
+  renderAIAdvisor();
+}
+
+function generateGuidelines() {
+  const n = BS.name||'YourBrand';
+  const arch = BS.archetype ? `<strong>Archetype:</strong> ${BS.archetype.charAt(0).toUpperCase()+BS.archetype.slice(1)}<br>` : '';
+  const traits = BS.traits.length ? `<strong>Personality:</strong> ${BS.traits.join(', ')}<br>` : '';
+  const html = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="background:var(--c3);border-radius:var(--r);padding:14px">
+        <div style="font-size:11px;color:var(--acc2);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Brand Identity</div>
+        <div style="font-size:13px;color:var(--txt2);line-height:1.8">${arch}${traits}
+          <strong>Primary Color:</strong> ${BS.colors.primary}<br>
+          <strong>Typography:</strong> ${BS.fonts.heading} / ${BS.fonts.body}
+        </div>
+      </div>
+      <div style="background:var(--c3);border-radius:var(--r);padding:14px">
+        <div style="font-size:11px;color:var(--acc2);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Usage Rules</div>
+        <div style="font-size:12px;color:var(--txt2);line-height:1.8">
+          ✓ Use primary color for CTAs<br>
+          ✓ Maintain minimum 4.5:1 contrast<br>
+          ✓ ${BS.fonts.heading} for all headings<br>
+          ✓ ${BS.fonts.body} minimum 16px for body<br>
+          ✗ Never distort the logo<br>
+          ✗ Never use unapproved color combinations
+        </div>
+      </div>
+      <div style="background:var(--c3);border-radius:var(--r);padding:14px;grid-column:1/-1">
+        <div style="font-size:11px;color:var(--acc2);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Color Palette</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          ${Object.entries(BS.colors).map(([k,v])=>`
+            <div style="text-align:center">
+              <div style="width:48px;height:48px;border-radius:8px;background:${v};border:1px solid var(--c4)"></div>
+              <div style="font-size:10px;color:var(--txt3);margin-top:4px">${k}</div>
+              <div style="font-size:10px;color:var(--txt2);font-weight:600">${v}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  const out = document.getElementById('guidelineOutput');
+  document.getElementById('guidelineContent').innerHTML = html;
+  out.style.display = 'block';
+  out.scrollIntoView({behavior:'smooth',block:'nearest'});
+  showToast('Guidelines generated!');
+}
+
+// ═══════════════════════════════════════════════════════
+// PALETTE FIXER
+// ═══════════════════════════════════════════════════════
+function hslToHex(h,s,l){
+  s/=100;l/=100;
+  const a=s*Math.min(l,1-l);
+  const f=n=>{const k=(n+h/30)%12;const c=l-a*Math.max(Math.min(k-3,9-k,1),-1);return Math.round(255*c).toString(16).padStart(2,'0')};
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+function hexToHsl(hex){
+  let r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){h=s=0;}else{
+    const d=max-min;s=l>.5?d/(2-max-min):d/(max+min);
+    switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;default:h=(r-g)/d+4;}
+    h/=6;
+  }
+  return [h*360,s*100,l*100];
+}
+
+function generatePalette() {
+  const base = document.getElementById('baseHue').value;
+  const style = document.getElementById('palStyle').value;
+  const count = parseInt(document.getElementById('palCount').value);
+  const [h,s,l] = hexToHsl(base);
+  let colors=[];
+  if(style==='professional'){
+    for(let i=0;i<count;i++) colors.push(hslToHex(h,(20+i*12)%100,20+i*(60/count)));
+  }else if(style==='vibrant'){
+    for(let i=0;i<count;i++) colors.push(hslToHex((h+i*(360/count))%360,75,55));
+  }else if(style==='muted'){
+    for(let i=0;i<count;i++) colors.push(hslToHex((h+i*15)%360,25,40+i*(40/count)));
+  }else if(style==='dark'){
+    for(let i=0;i<count;i++) colors.push(hslToHex(h,30+i*8,8+i*(30/count)));
+  }else if(style==='pastel'){
+    for(let i=0;i<count;i++) colors.push(hslToHex((h+i*(360/count))%360,40,75+i*(10/count)));
+  }else if(style==='monochrome'){
+    for(let i=0;i<count;i++) colors.push(hslToHex(h,s,15+i*(70/count)));
+  }else if(style==='earthy'){
+    const hues=[30,45,25,55,15];
+    for(let i=0;i<count;i++) colors.push(hslToHex(hues[i%hues.length],40+i*5,35+i*6));
+  }else if(style==='neon'){
+    for(let i=0;i<count;i++) colors.push(hslToHex((h+i*(360/count))%360,100,60));
+  }
+  BS.palette = colors;
+  renderPaletteDisplay(colors);
+}
+
+function renderPaletteDisplay(colors) {
+  const d = document.getElementById('paletteDisplay');
+  const strip = document.getElementById('paletteStrip');
+  d.innerHTML = `<div class="grid-4" style="grid-template-columns:repeat(${Math.min(colors.length,5)},1fr)">
+    ${colors.map(c=>`
+      <div class="swatch-wrap">
+        <div class="swatch" style="background:${c}" onclick="navigator.clipboard.writeText('${c}');showToast('Copied ${c}')"></div>
+        <div class="swatch-label">${c}</div>
+      </div>
+    `).join('')}
+  </div>`;
+  strip.innerHTML = colors.map(c=>`<div class="palette-chip" style="background:${c}" title="${c}"></div>`).join('');
+  document.getElementById('paletteMeta').textContent = `${colors.length} colors · Click any swatch to copy hex`;
+}
+
+function copyPaletteCSS() {
+  const css = ':root {\n' + BS.palette.map((c,i)=>`  --brand-${i+1}: ${c};`).join('\n') + '\n}';
+  navigator.clipboard.writeText(css);
+  showToast('CSS copied!');
+}
+
+function applyToBrand() {
+  if(BS.palette[0]) { document.getElementById('cprimary').value=BS.palette[0]; BS.colors.primary=BS.palette[0]; }
+  if(BS.palette[1]) { document.getElementById('csecondary').value=BS.palette[1]; BS.colors.secondary=BS.palette[1]; }
+  if(BS.palette[2]) { document.getElementById('caccent').value=BS.palette[2]; BS.colors.accent=BS.palette[2]; }
+  showToast('Palette applied to brand!');
+  buildExports();
+}
+
+// Fix colors
+let fixColors = ['#7c6dff','#4ecdc4','#0a0a0f'];
+function initFixColors() {
+  renderFixInputs();
+}
+
+function renderFixInputs() {
+  const wrap = document.getElementById('fixInputs');
+  wrap.innerHTML = fixColors.map((c,i)=>`
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <input type="color" value="${c}" style="width:44px;height:44px;padding:2px;border-radius:8px" oninput="fixColors[${i}]=this.value">
+      <span style="font-size:10px;color:var(--txt3)">${c}</span>
+    </div>
+  `).join('');
+}
+
+function addFixColor() {
+  if(fixColors.length<8) { fixColors.push('#888888'); renderFixInputs(); }
+}
+
+function analyzeColors() {
+  const report = document.getElementById('fixReport');
+  let html = '<div style="display:grid;gap:10px">';
+  fixColors.forEach((c,i)=>{
+    const [h,s,l] = hexToHsl(c);
+    const issues = [];
+    if(l<15) issues.push({t:'Too Dark',f:'May reduce readability',fix:hslToHex(h,s,20)});
+    if(l>90) issues.push({t:'Too Light',f:'May lack contrast',fix:hslToHex(h,s,75)});
+    if(s<10) issues.push({t:'Low Saturation',f:'Appears washed out',fix:hslToHex(h,40,l)});
+    const status = issues.length===0 ? 'Healthy' : 'Needs Fix';
+    const statusColor = issues.length===0 ? 'var(--teal)' : 'var(--gold)';
+    html += `
+      <div style="background:var(--c3);border-radius:var(--r);padding:14px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
+        <div style="width:48px;height:48px;border-radius:8px;background:${c};flex-shrink:0"></div>
+        <div style="flex:1;min-width:160px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:600;color:var(--txt1)">${c}</span>
+            <span style="font-size:10px;color:${statusColor};font-weight:700;padding:2px 8px;background:rgba(0,0,0,.3);border-radius:20px">${status}</span>
+          </div>
+          <div style="font-size:11px;color:var(--txt3)">H:${Math.round(h)}° S:${Math.round(s)}% L:${Math.round(l)}%</div>
+          ${issues.map(iss=>`
+            <div style="margin-top:8px;padding:8px;background:var(--c4);border-radius:6px">
+              <span style="color:var(--gold);font-size:11px;font-weight:600">⚠ ${iss.t}</span>
+              <span style="color:var(--txt3);font-size:11px;margin-left:6px">${iss.f}</span>
+              <div style="margin-top:5px;display:flex;align-items:center;gap:6px">
+                <span style="font-size:10px;color:var(--txt3)">Fix →</span>
+                <div style="width:20px;height:20px;border-radius:4px;background:${iss.fix}"></div>
+                <span style="font-size:10px;color:var(--txt2)">${iss.fix}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  report.innerHTML = html;
+}
+
+// Harmonies
+function generateHarmonies() {
+  const root = document.getElementById('harmonyRoot').value;
+  const type = document.getElementById('harmonyType').value;
+  const [h,s,l] = hexToHsl(root);
+  let harmonies=[];
+  if(type==='complementary') harmonies=[root,hslToHex((h+180)%360,s,l)];
+  else if(type==='triadic') harmonies=[root,hslToHex((h+120)%360,s,l),hslToHex((h+240)%360,s,l)];
+  else if(type==='analogous') harmonies=[hslToHex((h-30+360)%360,s,l),root,hslToHex((h+30)%360,s,l)];
+  else if(type==='split') harmonies=[root,hslToHex((h+150)%360,s,l),hslToHex((h+210)%360,s,l)];
+  else if(type==='tetradic') harmonies=[root,hslToHex((h+90)%360,s,l),hslToHex((h+180)%360,s,l),hslToHex((h+270)%360,s,l)];
+  else if(type==='square') harmonies=[root,hslToHex((h+90)%360,s,l),hslToHex((h+180)%360,s,l),hslToHex((h+270)%360,s,l)];
+  
+  const d = document.getElementById('harmoniesDisplay');
+  d.innerHTML = `
+    <div style="display:flex;gap:0;border-radius:var(--r);overflow:hidden;height:80px;margin-bottom:14px">
+      ${harmonies.map(c=>`<div style="flex:1;background:${c};transition:.3s" title="${c}"></div>`).join('')}
+    </div>
+    <div class="grid-4">
+      ${harmonies.map(c=>`
+        <div class="swatch-wrap">
+          <div class="swatch" style="background:${c}" onclick="navigator.clipboard.writeText('${c}');showToast('Copied!')"></div>
+          <div class="swatch-label">${c}</div>
+        </div>
+      `).join('')}
+    </div>
+    <p style="font-size:12px;color:var(--txt3);margin-top:10px">Click any swatch to copy. ${harmonies.length} harmonious colors based on ${type} theory.</p>
+  `;
+}
+
+// Contrast
+function getLuminance(hex){
+  const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
+  const toLinear=c=>c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4);
+  return .2126*toLinear(r)+.7152*toLinear(g)+.0722*toLinear(b);
+}
+
+function getContrast(c1,c2){
+  const l1=getLuminance(c1),l2=getLuminance(c2);
+  return (Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05);
+}
+
+function checkContrast() {
+  const fg=document.getElementById('fg').value,bg=document.getElementById('bg').value;
+  const ratio = getContrast(fg,bg);
+  const aa = ratio>=4.5,aaa=ratio>=7,aaLg=ratio>=3;
+  document.getElementById('contrastResult').innerHTML = `
+    <div style="background:${bg};border-radius:var(--r);padding:16px;border:1px solid var(--c4);margin-bottom:12px">
+      <p style="font-family:'Inter',sans-serif;color:${fg};font-size:18px;font-weight:600;margin-bottom:4px">Sample Heading Text</p>
+      <p style="font-family:'Inter',sans-serif;color:${fg};font-size:13px;opacity:.9">This is how body text appears with your color combination.</p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <div style="font-size:24px;font-weight:700;font-family:'Space Grotesk',sans-serif;color:var(--txt1)">${ratio.toFixed(2)}:1</div>
+      <span class="a11y-chip ${aaa?'a11y-pass':aa?'a11y-warn':'a11y-fail'}">AAA ${aaa?'✓':'✗'}</span>
+      <span class="a11y-chip ${aa?'a11y-pass':aaLg?'a11y-warn':'a11y-fail'}">AA ${aa?'✓':'✗'}</span>
+      <span class="a11y-chip ${aaLg?'a11y-pass':'a11y-fail'}">AA Large ${aaLg?'✓':'✗'}</span>
+    </div>
+    <p style="font-size:12px;color:var(--txt3);margin-top:8px">WCAG 2.1 · AA requires 4.5:1 · AAA requires 7:1 · Large text (18pt+) requires 3:1</p>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════
+// TYPOGRAPHY
+// ═══════════════════════════════════════════════════════
+function renderFontLibrary() {
+  const catF = document.getElementById('fontCatFilter').value;
+  const indF = document.getElementById('fontIndustryFilter').value;
+  const filtered = FONT_DB.filter(f=>{
+    if(catF && f.cat!==catF) return false;
+    if(indF && !f.tags.includes(indF)) return false;
+    return true;
+  });
+  const grid = document.getElementById('fontLibGrid');
+  grid.innerHTML = filtered.map(f=>`
+    <div class="font-card ${BS.fonts.heading===f.name||BS.fonts.body===f.name?'active':''}" onclick="selectFont('${f.name}')">
+      <div class="fc-cat">${f.cat}</div>
+      <div class="fc-name">${f.name}</div>
+      <div class="fc-sample" style="font-family:${f.css};font-size:22px">${f.sample}</div>
+      <div class="fc-tag">${f.tags.slice(0,3).join(' · ')}</div>
+      <div style="font-size:11px;color:var(--txt3);margin-top:4px">${f.desc}</div>
+    </div>
+  `).join('');
+}
+
+function selectFont(name) {
+  BS.fonts.heading = name;
+  const f = FONT_DB.find(x=>x.name===name);
+  if(f) {
+    document.getElementById('selHeading').value = name;
+    updateTypoPrev();
+    renderFontLibrary();
+    renderHealthScore();
+    renderAIAdvisor();
+    renderTypeScale();
+    showToast(`${name} selected as heading font`);
+  }
+}
+
+function populateFontSelects() {
+  const opts = FONT_DB.map(f=>`<option value="${f.name}">${f.name}</option>`).join('');
+  ['selHeading','selBody','selUI'].forEach(id=>{
+    document.getElementById(id).innerHTML = opts;
+  });
+  document.getElementById('selHeading').value = BS.fonts.heading;
+  document.getElementById('selBody').value = BS.fonts.body;
+  document.getElementById('selUI').value = BS.fonts.ui;
+}
+
+function updateTypoPrev() {
+  BS.fonts.heading = document.getElementById('selHeading').value;
+  BS.fonts.body = document.getElementById('selBody').value;
+  BS.fonts.ui = document.getElementById('selUI').value;
+  renderTypoPreview(document.querySelector('#prevToggle .toggle-btn.active')?.dataset?.mode||'website');
+  renderCompare();
+  renderHealthScore();
+  renderAIAdvisor();
+  renderTypeScale();
+  buildExports();
+}
+
+function suggestPairings() {
+  const ind = document.getElementById('pairingIndustry').value;
+  const relevant = PAIRS.filter(p=>{
+    if(ind && !p.industries.includes(ind)) return false;
+    if(BS.traits.length && !BS.traits.some(t=>p.traits.includes(t.toLowerCase()))) {
+      if(!ind) return false;
+    }
+    return true;
+  }).slice(0,4);
+  const all = relevant.length ? relevant : PAIRS.slice(0,3);
+  
+  document.getElementById('pairingResults').innerHTML = all.map((p,i)=>`
+    <div style="background:var(--c3);border-radius:var(--r);padding:12px;margin-bottom:10px;cursor:pointer;border:1px solid var(--c4);transition:all .2s" 
+      onmouseenter="this.style.borderColor='var(--acc2)'" onmouseleave="this.style.borderColor='var(--c4)'"
+      onclick="applyPairing(${PAIRS.indexOf(p)})">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:11px;color:var(--acc2);font-weight:700">${p.label}</span>
+        ${i===0?`<span style="font-size:9px;background:var(--acc);color:#fff;padding:2px 7px;border-radius:20px;font-weight:700">BEST MATCH</span>`:''}
+      </div>
+      <div style="font-family:'${p.h}',sans-serif,serif;font-size:18px;font-weight:700;color:var(--txt1);margin-bottom:3px">${BS.name||'Brand Name'}</div>
+      <div style="font-family:'${p.b}',sans-serif,serif;font-size:12px;color:var(--txt2)">${p.desc}</div>
+      <div style="margin-top:8px;font-size:10px;color:var(--txt3)">H: ${p.h} · B: ${p.b} · UI: ${p.ui}</div>
+    </div>
+  `).join('');
+}
+
+function applyPairing(idx) {
+  const p = PAIRS[idx];
+  BS.fonts.heading = p.h; BS.fonts.body = p.b; BS.fonts.ui = p.ui;
+  document.getElementById('selHeading').value = p.h;
+  document.getElementById('selBody').value = p.b;
+  document.getElementById('selUI').value = p.ui;
+  updateTypoPrev();
+  showToast(`Applied: ${p.h} + ${p.b}`);
+}
+
+let prevMode='website';
+function switchPrevMode(mode,el){
+  document.querySelectorAll('#prevToggle .toggle-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  el.dataset.mode=mode;
+  prevMode=mode;
+  renderTypoPreview(mode);
+}
+
+function renderTypoPreview(mode) {
+  const hf = `font-family:'${BS.fonts.heading}',sans-serif,serif`;
+  const bf = `font-family:'${BS.fonts.body}',sans-serif,serif`;
+  const p = BS.colors.primary;
+  const bg = '#13131a';
+  const wrap = document.getElementById('typographyPreview');
+  
+  if(mode==='website') {
+    wrap.innerHTML = `
+      <div class="brand-mockup">
+        <div class="mockup-bar">
+          <div class="mock-dot" style="background:#ff5f56"></div>
+          <div class="mock-dot" style="background:#ffbd2e"></div>
+          <div class="mock-dot" style="background:#27c93f"></div>
+          <span style="font-size:11px;color:var(--txt3);margin-left:8px;${bf}">${BS.name.toLowerCase()}.com</span>
+        </div>
+        <div style="background:${bg};padding:32px 28px">
+          <div style="font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:${p};margin-bottom:10px;${hf}">${BS.industry||'TECHNOLOGY'}</div>
+          <h1 style="${hf};font-size:clamp(24px,4vw,44px);font-weight:700;color:#f0eff8;line-height:1.1;margin-bottom:14px">${BS.name||'Brand Name'}<br><span style="color:${p}">Reimagined.</span></h1>
+          <p style="${bf};font-size:14px;color:#8a8a9a;line-height:1.7;max-width:480px;margin-bottom:20px">${BS.tagline||'Your tagline here'}. Crafted with precision and designed for impact.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button style="background:${p};color:#fff;border:none;padding:11px 22px;border-radius:8px;${hf};font-weight:600;font-size:13px;cursor:pointer">Get Started →</button>
+            <button style="background:transparent;color:#f0eff8;border:1px solid #32324a;padding:11px 22px;border-radius:8px;${bf};font-size:13px;cursor:pointer">Learn More</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px">
+            ${['Innovative Design','Proven Results','Trusted Platform'].map(t=>`
+              <div style="background:#1c1c27;border-radius:8px;padding:14px;border:1px solid #252535">
+                <div style="${hf};font-weight:600;font-size:14px;color:#f0eff8;margin-bottom:5px">${t}</div>
+                <div style="${bf};font-size:12px;color:#6a6a7a;line-height:1.5">Excellence in every detail.</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>`;
+  } else if(mode==='card') {
+    wrap.innerHTML = `
+      <div style="display:flex;justify-content:center;padding:20px 0">
+        <div style="width:340px;height:190px;background:linear-gradient(135deg,${p} 0%,${BS.colors.secondary||'#4ecdc4'} 100%);border-radius:12px;padding:24px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+          <div style="${hf};font-size:20px;font-weight:700;color:#fff;letter-spacing:-.5px">${BS.name||'Brand'}</div>
+          <div style="${bf};font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">${BS.tagline||'Your tagline'}</div>
+          <div style="position:absolute;bottom:24px;left:24px">
+            <div style="${hf};color:#fff;font-size:13px;font-weight:600">Creative Director</div>
+            <div style="${bf};color:rgba(255,255,255,.7);font-size:11px;margin-top:2px">hello@${(BS.name||'brand').toLowerCase()}.com</div>
+          </div>
+          <div style="position:absolute;bottom:24px;right:24px;opacity:.3">
+            <div style="width:50px;height:50px;border:2px solid #fff;border-radius:50%"></div>
+          </div>
+        </div>
+      </div>`;
+  } else if(mode==='social') {
+    wrap.innerHTML = `
+      <div style="display:flex;justify-content:center;padding:20px 0">
+        <div style="width:320px;height:320px;background:${bg};border-radius:16px;overflow:hidden;position:relative">
+          <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,rgba(124,109,255,.15) 0%,transparent 60%)"></div>
+          <div style="padding:28px;height:100%;display:flex;flex-direction:column;justify-content:center">
+            <div style="${hf};font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${p};margin-bottom:12px">${BS.industry||'FEATURED'}</div>
+            <h2 style="${hf};font-size:28px;font-weight:700;color:#f0eff8;line-height:1.15;margin-bottom:12px">${BS.tagline||'Illuminate<br>Your World'}</h2>
+            <p style="${bf};font-size:12px;color:#7a7a8a;line-height:1.5;margin-bottom:20px">Transforming ideas into extraordinary experiences.</p>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:32px;height:32px;border-radius:50%;background:${p}"></div>
+              <span style="${bf};font-size:12px;font-weight:600;color:#f0eff8">${BS.name||'Brand'}</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  } else if(mode==='app') {
+    wrap.innerHTML = `
+      <div style="display:flex;justify-content:center;padding:20px 0">
+        <div style="width:280px;background:#0d0d18;border-radius:24px;overflow:hidden;border:6px solid #252535">
+          <div style="height:24px;background:#0d0d18;display:flex;align-items:center;justify-content:center">
+            <div style="width:60px;height:4px;background:#252535;border-radius:2px"></div>
+          </div>
+          <div style="padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <div style="${hf};font-size:18px;font-weight:700;color:#f0eff8">${BS.name||'App'}</div>
+              <div style="width:32px;height:32px;border-radius:50%;background:${p};display:flex;align-items:center;justify-content:center">
+                <span style="font-size:14px;color:#fff">⊞</span>
+              </div>
+            </div>
+            ${['Dashboard','Analytics','Settings'].map((item,i)=>`
+              <div style="background:${i===0?p:'#1c1c27'};border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:8px;background:${i===0?'rgba(255,255,255,.2)':p+'22'};display:flex;align-items:center;justify-content:center">
+                  <span style="font-size:14px;color:${i===0?'#fff':p}">◈</span>
+                </div>
+                <div>
+                  <div style="${hf};font-size:13px;font-weight:600;color:${i===0?'#fff':'#f0eff8'}">${item}</div>
+                  <div style="${bf};font-size:10px;color:${i===0?'rgba(255,255,255,.6)':'#6a6a7a'}">View details</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+function renderCompare() {
+  const comparePairs = PAIRS.slice(0,3);
+  const hf = n=>`font-family:'${n}',sans-serif,serif`;
+  document.getElementById('compareGrid').innerHTML = comparePairs.map((p,i)=>`
+    <div class="compare-col ${i===0?'winner':''}">
+      ${i===0?`<div class="compare-badge">RECOMMENDED</div>`:''}
+      <div style="${hf(p.h)};font-size:22px;font-weight:700;color:var(--txt1);margin-bottom:4px;line-height:1.1">${BS.name||'Brand'}</div>
+      <div style="${hf(p.b)};font-size:12px;color:var(--txt2);margin-bottom:12px;line-height:1.5">The quick brown fox. Body text example.</div>
+      <div style="font-size:10px;color:var(--txt3)">H: <strong style="color:var(--txt2)">${p.h}</strong></div>
+      <div style="font-size:10px;color:var(--txt3);margin-top:2px">B: <strong style="color:var(--txt2)">${p.b}</strong></div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%" onclick="applyPairing(${PAIRS.indexOf(p)})">Apply</button>
+    </div>
+  `).join('');
+}
+
+function renderHealthScore() {
+  const hf = FONT_DB.find(f=>f.name===BS.fonts.heading);
+  const bf = FONT_DB.find(f=>f.name===BS.fonts.body);
+  const scores = {
+    Readability: bf ? (bf.cat==='Sans Serif'?88:75) : 75,
+    Accessibility: 85,
+    Hierarchy: hf&&bf&&hf.name!==bf.name ? 92 : 70,
+    'Brand Alignment': BS.traits.length ? Math.min(95,70+BS.traits.length*5) : 65,
+    'Professional Appeal': 82
+  };
+  const total = Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/Object.keys(scores).length);
+  document.getElementById('healthScore').innerHTML = `
+    <div style="text-align:center;margin-bottom:16px">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r="34" fill="none" stroke="var(--c4)" stroke-width="6"/>
+        <circle cx="40" cy="40" r="34" fill="none" stroke="var(--acc)" stroke-width="6"
+          stroke-dasharray="${2*Math.PI*34}" stroke-dashoffset="${2*Math.PI*34*(1-total/100)}"
+          stroke-linecap="round" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s"/>
+        <text x="40" y="44" text-anchor="middle" fill="#f0eff8" font-size="18" font-weight="700" font-family="Space Grotesk">${total}</text>
+      </svg>
+      <div style="font-size:12px;color:var(--txt3);margin-top:4px">Typography Score</div>
+    </div>
+    ${Object.entries(scores).map(([k,v])=>`
+      <div class="health-item">
+        <span class="health-label">${k}</span>
+        <div style="flex:2"><div class="score-bar"><div class="score-fill" style="width:${v}%"></div></div></div>
+        <span class="health-score" style="color:${v>=85?'var(--teal)':v>=70?'var(--gold)':'var(--rose)'}">${v}</span>
+      </div>
+    `).join('')}
+  `;
+}
+
+function renderA11y() {
+  const recs = [
+    {label:'Minimum font size',val:'16px body / 14px UI',status:'pass'},
+    {label:'Heading contrast AA',val:'Check with palette',status:'warn'},
+    {label:'Line height',val:'1.5–1.8 recommended',status:'pass'},
+    {label:'Letter spacing',val:'Normal to wide for readability',status:'pass'},
+    {label:'Font weight range',val:'400 body, 600–700 headings',status:'pass'},
+    {label:'Dyslexia compatibility',val:`${BS.fonts.body} — Open-form letterforms`,status:'pass'},
+  ];
+  document.getElementById('a11yAnalysis').innerHTML = recs.map(r=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--c3)">
+      <span style="font-size:12px;color:var(--txt2)">${r.label}</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--txt3)">${r.val}</span>
+        <span class="a11y-chip a11y-${r.status}">${r.status.toUpperCase()}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAIAdvisor() {
+  const h = BS.fonts.heading || 'Space Grotesk';
+  const b = BS.fonts.body || 'Inter';
+  const ind = BS.industry || 'technology';
+  const traits = BS.traits.length ? BS.traits.join(', ').toLowerCase() : 'modern';
+  const advisorTexts = {
+    technology:`<strong>${h}</strong> was selected for its geometric precision and technical authority, signaling innovation. <strong>${b}</strong> ensures maximum readability across digital interfaces, critical for technology products.`,
+    luxury:`<strong>${h}</strong> adds editorial elegance and timeless refinement appropriate for premium positioning. Paired with <strong>${b}</strong>, it creates a hierarchy that feels curated and intentional.`,
+    healthcare:`<strong>${h}</strong> communicates trustworthiness and clinical clarity. <strong>${b}</strong> maintains warmth and readability, making complex information accessible and reassuring.`,
+    finance:`<strong>${h}</strong> projects authority and stability. <strong>${b}</strong> maintains precision and professionalism across all financial communications.`,
+    default:`<strong>${h}</strong> establishes visual hierarchy and brand personality matching your ${traits} traits. <strong>${b}</strong> complements it with superior readability and versatility across touchpoints.`
+  };
+  const text = advisorTexts[ind]||advisorTexts.default;
+  document.getElementById('aiAdvisor').innerHTML = `
+    <div class="ai-chip">✦ AI Typography Analysis</div>
+    <div style="background:var(--c3);border-radius:var(--r);padding:14px;font-size:13px;color:var(--txt2);line-height:1.7">${text}</div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      ${PAIRS.filter(p=>p.industries.includes(ind)).slice(0,2).map(p=>`
+        <div style="background:var(--c3);border-radius:var(--r3);padding:8px 12px;font-size:11px;color:var(--txt2)">
+          ✓ <strong>${p.h}</strong> + <strong>${p.b}</strong> — <span style="color:var(--txt3)">${p.label}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+const SCALE_STEPS = [
+  {name:'Display XL',size:56,lh:1.1,ls:'-1px',w:700},
+  {name:'Display',size:44,lh:1.15,ls:'-.5px',w:700},
+  {name:'H1',size:36,lh:1.2,ls:'-.3px',w:600},
+  {name:'H2',size:28,lh:1.25,ls:'-.2px',w:600},
+  {name:'H3',size:22,lh:1.3,ls:'0',w:600},
+  {name:'H4',size:18,lh:1.35,ls:'0',w:500},
+  {name:'Body L',size:18,lh:1.7,ls:'0',w:400},
+  {name:'Body',size:16,lh:1.7,ls:'0',w:400},
+  {name:'Small',size:14,lh:1.5,ls:'0',w:400},
+  {name:'Caption',size:12,lh:1.4,ls:'.2px',w:400},
+  {name:'Label',size:11,lh:1.3,ls:'.8px',w:600},
+];
+
+function renderTypeScale() {
+  const hf = `font-family:'${BS.fonts.heading}',sans-serif,serif`;
+  const bf = `font-family:'${BS.fonts.body}',sans-serif,serif`;
+  document.getElementById('typeScale').innerHTML = SCALE_STEPS.map(s=>{
+    const isHead = s.name.startsWith('H')||s.name.startsWith('Display');
+    return `
+      <div class="scale-row">
+        <span class="scale-size">${s.size}px</span>
+        <span class="scale-name" style="color:var(--txt3)">${s.name}</span>
+        <span style="${isHead?hf:bf};font-size:${Math.min(s.size,28)}px;font-weight:${s.w};color:var(--txt1);line-height:1">${s.name}</span>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('typeSpecs').innerHTML = `
+    <div style="font-size:12px;color:var(--txt2);line-height:1.9">
+      <div><strong style="color:var(--txt1)">Heading Family:</strong> ${BS.fonts.heading}</div>
+      <div><strong style="color:var(--txt1)">Body Family:</strong> ${BS.fonts.body}</div>
+      <div><strong style="color:var(--txt1)">UI / Mono:</strong> ${BS.fonts.ui}</div>
+      <div class="divider"></div>
+      <div><strong style="color:var(--txt1)">Base Size:</strong> 16px</div>
+      <div><strong style="color:var(--txt1)">Scale Ratio:</strong> 1.25 (Major Third)</div>
+      <div><strong style="color:var(--txt1)">Line Height (body):</strong> 1.7</div>
+      <div><strong style="color:var(--txt1)">Line Height (heads):</strong> 1.1–1.3</div>
+      <div><strong style="color:var(--txt1)">Font Weights:</strong> 400, 500, 600, 700</div>
+      <div><strong style="color:var(--txt1)">Letter Spacing:</strong> –1px to +1px</div>
+    </div>
+  `;
+
+  document.getElementById('respTypo').innerHTML = `
+    <div class="grid-3">
+      ${[
+        {bp:'Mobile (< 640px)',h:'28–36px',b:'15px',scale:'1.2'},
+        {bp:'Tablet (640–1024px)',h:'36–44px',b:'16px',scale:'1.25'},
+        {bp:'Desktop (> 1024px)',h:'44–72px',b:'18px',scale:'1.333'},
+      ].map(r=>`
+        <div style="background:var(--c3);border-radius:var(--r);padding:14px">
+          <div style="font-size:11px;color:var(--acc2);font-weight:700;margin-bottom:8px">${r.bp}</div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.8">
+            <span>H1: ${r.h}</span><br>
+            <span>Body: ${r.b}</span><br>
+            <span>Scale: ${r.scale}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════
+// LIVE PREVIEW
+// ═══════════════════════════════════════════════════════
+function switchLivePrev(mode,el){
+  document.querySelectorAll('#sec-preview .toggle-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderLivePreview(mode);
+}
+
+function renderLivePreview(mode) {
+  const wrap = document.getElementById('livePreviewWrap');
+  const p = BS.colors.primary;
+  const s = BS.colors.secondary||'#4ecdc4';
+  const a = BS.colors.accent||'#d4a853';
+  const bg = BS.colors.bg||'#0a0a0f';
+  const hf = `font-family:'${BS.fonts.heading}',sans-serif,serif`;
+  const bf = `font-family:'${BS.fonts.body}',sans-serif,serif`;
+  const name = BS.name||'Brand';
+  const tagline = BS.tagline||'Your tagline here';
+
+  if(mode==='website') {
+    wrap.innerHTML = `
+      <div style="border-radius:16px;overflow:hidden;border:1px solid var(--c4)">
+        <div style="background:var(--c4);height:36px;display:flex;align-items:center;padding:0 14px;gap:6px">
+          <div style="width:10px;height:10px;border-radius:50%;background:#ff5f56"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#ffbd2e"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#27c93f"></div>
+          <div style="flex:1;margin-left:8px;height:22px;background:var(--c3);border-radius:4px;display:flex;align-items:center;padding:0 10px">
+            <span style="${bf};font-size:11px;color:var(--txt3)">${name.toLowerCase()}.com</span>
+          </div>
+        </div>
+        <div style="background:${bg}">
+          <nav style="padding:14px 28px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:20px">
+            <span style="${hf};font-size:16px;font-weight:700;color:#f0eff8">${name}</span>
+            <div style="display:flex;gap:16px;margin-left:auto">
+              ${['Product','About','Pricing'].map(l=>`<span style="${bf};font-size:12px;color:rgba(255,255,255,.5);cursor:pointer">${l}</span>`).join('')}
+              <button style="background:${p};color:#fff;border:none;padding:6px 14px;border-radius:6px;${hf};font-size:12px;font-weight:600;cursor:pointer">Sign Up</button>
+            </div>
+          </nav>
+          <div style="padding:60px 28px 40px">
+            <div style="${hf};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${p};margin-bottom:12px">Now Available</div>
+            <h1 style="${hf};font-size:clamp(28px,4vw,52px);font-weight:700;color:#f0eff8;line-height:1.1;margin-bottom:16px">${tagline}</h1>
+            <p style="${bf};font-size:15px;color:rgba(255,255,255,.5);line-height:1.7;max-width:520px;margin-bottom:28px">Build powerful brand systems that scale. From identity to implementation, we've got you covered with professional tools.</p>
+            <div style="display:flex;gap:12px;margin-bottom:48px;flex-wrap:wrap">
+              <button style="background:${p};color:#fff;border:none;padding:13px 26px;border-radius:8px;${hf};font-weight:600;font-size:14px;cursor:pointer">Start Building →</button>
+              <button style="background:transparent;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);padding:13px 26px;border-radius:8px;${bf};font-size:14px;cursor:pointer">Watch Demo</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+              ${[[p,'Identity'],[s,'Palette'],[a,'Typography']].map(([c,t])=>`
+                <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:18px">
+                  <div style="width:36px;height:36px;border-radius:8px;background:${c}22;display:flex;align-items:center;justify-content:center;margin-bottom:10px">
+                    <div style="width:16px;height:16px;border-radius:4px;background:${c}"></div>
+                  </div>
+                  <div style="${hf};font-size:14px;font-weight:600;color:#f0eff8;margin-bottom:4px">${t}</div>
+                  <div style="${bf};font-size:12px;color:rgba(255,255,255,.4);line-height:1.5">Professional grade tools</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      </div>`;
+  } else if(mode==='app') {
+    wrap.innerHTML = `
+      <div style="display:flex;justify-content:center;padding:10px 0">
+        <div style="width:320px;background:${bg};border-radius:28px;border:8px solid var(--c4);overflow:hidden">
+          <div style="height:28px;background:${bg};display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px">
+            <div style="width:80px;height:5px;background:var(--c4);border-radius:3px"></div>
+          </div>
+          <div style="padding:16px 16px 24px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+              <div style="width:36px;height:36px;border-radius:10px;background:${p};display:flex;align-items:center;justify-content:center">
+                <span style="${hf};font-size:16px;font-weight:700;color:#fff">${name[0]}</span>
+              </div>
+              <div>
+                <div style="${hf};font-size:14px;font-weight:600;color:#f0eff8">${name}</div>
+                <div style="${bf};font-size:11px;color:rgba(255,255,255,.4)">Dashboard</div>
+              </div>
+            </div>
+            <div style="background:linear-gradient(135deg,${p},${s});border-radius:14px;padding:18px;margin-bottom:14px">
+              <div style="${bf};font-size:11px;color:rgba(255,255,255,.7);margin-bottom:4px">Total Revenue</div>
+              <div style="${hf};font-size:26px;font-weight:700;color:#fff">$48,200</div>
+              <div style="${bf};font-size:11px;color:rgba(255,255,255,.6);margin-top:6px">↑ 24% this month</div>
+            </div>
+            ${['Campaigns','Analytics','Reports'].map((item,i)=>`
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.04);border-radius:10px;margin-bottom:8px">
+                <div style="width:28px;height:28px;border-radius:7px;background:${[p,s,a][i]}22;display:flex;align-items:center;justify-content:center">
+                  <div style="width:10px;height:10px;border-radius:2px;background:${[p,s,a][i]}"></div>
+                </div>
+                <span style="${hf};font-size:13px;font-weight:500;color:#f0eff8">${item}</span>
+                <span style="${bf};font-size:11px;color:rgba(255,255,255,.3);margin-left:auto">→</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>`;
+  } else if(mode==='social') {
+    wrap.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:600px;margin:0 auto">
+        <div style="aspect-ratio:1;background:${bg};border-radius:14px;overflow:hidden;padding:20px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid var(--c4);position:relative">
+          <div style="position:absolute;top:0;right:0;width:100px;height:100px;background:${p};border-radius:0 14px 0 100%"></div>
+          <div style="${hf};font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${p};margin-bottom:6px">${name}</div>
+          <div style="${hf};font-size:18px;font-weight:700;color:#f0eff8;line-height:1.2">${tagline}</div>
+        </div>
+        <div style="aspect-ratio:1;background:${p};border-radius:14px;overflow:hidden;padding:20px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+          <div style="${hf};font-size:32px;font-weight:700;color:#fff;line-height:1">${name[0]}</div>
+          <div style="${hf};font-size:14px;font-weight:600;color:rgba(255,255,255,.9);margin-top:8px">${name}</div>
+          <div style="${bf};font-size:11px;color:rgba(255,255,255,.6);margin-top:4px">${BS.industry||'Brand'}</div>
+        </div>
+        <div style="aspect-ratio:2/1;grid-column:1/-1;background:linear-gradient(135deg,${bg},${p}22);border-radius:14px;padding:20px;display:flex;align-items:center;gap:20px;border:1px solid rgba(255,255,255,.08)">
+          <div style="width:48px;height:48px;border-radius:12px;background:${p};flex-shrink:0"></div>
+          <div>
+            <div style="${hf};font-size:16px;font-weight:700;color:#f0eff8">${tagline}</div>
+            <div style="${bf};font-size:12px;color:rgba(255,255,255,.4);margin-top:3px">Brand Story · ${name}</div>
+          </div>
+        </div>
+      </div>`;
+  } else if(mode==='pres') {
+    wrap.innerHTML = `
+      <div style="background:${bg};border-radius:14px;overflow:hidden;border:1px solid var(--c4);aspect-ratio:16/9;display:flex;flex-direction:column">
+        <div style="background:${p};height:4px"></div>
+        <div style="flex:1;padding:40px;display:flex;align-items:center">
+          <div>
+            <div style="${hf};font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:${p};margin-bottom:12px">COMPANY OVERVIEW</div>
+            <h1 style="${hf};font-size:clamp(20px,3vw,42px);font-weight:700;color:#f0eff8;line-height:1.15;margin-bottom:14px">${name}<br><span style="color:${p}">${tagline}</span></h1>
+            <p style="${bf};font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;max-width:400px">Transforming how brands are built and experienced. Professional tools for the modern creative team.</p>
+          </div>
+        </div>
+        <div style="padding:14px 40px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center">
+          <span style="${hf};font-size:11px;font-weight:600;color:rgba(255,255,255,.3)">${name} · Brand Presentation</span>
+          <div style="display:flex;gap:6px">
+            ${[p,s,a].map(c=>`<div style="width:20px;height:3px;border-radius:2px;background:${c}"></div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════
+function buildExports() {
+  const hf = BS.fonts.heading||'Space Grotesk';
+  const bf = BS.fonts.body||'Inter';
+  const ui = BS.fonts.ui||'IBM Plex Sans';
+  const c = BS.colors;
+
+  document.getElementById('cssExport').textContent = 
+`:root {
+  /* Brand Identity: ${BS.name||'Brand'} */
+
+  /* Colors */
+  --color-primary: ${c.primary};
+  --color-secondary: ${c.secondary||'#4ecdc4'};
+  --color-accent: ${c.accent||'#d4a853'};
+  --color-background: ${c.bg||'#0a0a0f'};
+  --color-text: ${c.text||'#f0eff8'};
+
+  /* Typography */
+  --font-heading: '${hf}', sans-serif;
+  --font-body: '${bf}', sans-serif;
+  --font-ui: '${ui}', sans-serif;
+
+  /* Type Scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-4: 1rem;
+  --space-8: 2rem;
+  --space-16: 4rem;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+}`;
+
+  document.getElementById('tailwindExport').textContent = 
+`// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          primary: '${c.primary}',
+          secondary: '${c.secondary||'#4ecdc4'}',
+          accent: '${c.accent||'#d4a853'}',
+          bg: '${c.bg||'#0a0a0f'}',
+        }
+      },
+      fontFamily: {
+        heading: ['${hf}', 'sans-serif'],
+        body: ['${bf}', 'sans-serif'],
+        ui: ['${ui}', 'monospace'],
+      },
+      fontSize: {
+        'display': ['3.5rem', { lineHeight: '1.1' }],
+        'h1': ['2.25rem', { lineHeight: '1.2' }],
+        'h2': ['1.875rem', { lineHeight: '1.25' }],
+        'h3': ['1.5rem', { lineHeight: '1.3' }],
+      }
+    }
+  }
+}`;
+
+  document.getElementById('tokensExport').textContent = 
+JSON.stringify({
+  color: {
+    primary: { value: c.primary, type: 'color' },
+    secondary: { value: c.secondary||'#4ecdc4', type: 'color' },
+    accent: { value: c.accent||'#d4a853', type: 'color' },
+    background: { value: c.bg||'#0a0a0f', type: 'color' },
+  },
+  typography: {
+    fontHeading: { value: hf, type: 'fontFamily' },
+    fontBody: { value: bf, type: 'fontFamily' },
+    fontUI: { value: ui, type: 'fontFamily' },
+    sizeBase: { value: '16px', type: 'fontSize' },
+  }
+}, null, 2);
+
+  document.getElementById('figmaExport').textContent = 
+JSON.stringify({
+  "$schema": "https://stepsapp.org/tokens/schema/1.0",
+  "global": {
+    "brand-primary": { "$value": c.primary, "$type": "color" },
+    "brand-secondary": { "$value": c.secondary||'#4ecdc4', "$type": "color" },
+    "font-heading": { "$value": hf, "$type": "fontFamily" },
+    "font-body": { "$value": bf, "$type": "fontFamily" },
+    "size-base": { "$value": "16", "$type": "fontSize" },
+    "size-h1": { "$value": "36", "$type": "fontSize" },
+    "weight-bold": { "$value": "700", "$type": "fontWeight" },
+    "line-height-body": { "$value": "1.7", "$type": "lineHeight" },
+  }
+}, null, 2);
+}
+
+function copyExport(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.textContent);
+  showToast('Copied to clipboard!');
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+function copyPaletteCSS() {
+  const css = BS.palette.map((c,i)=>`--color-${i+1}: ${c};`).join('\n');
+  navigator.clipboard.writeText(`:root {\n${css}\n}`);
+  showToast('Palette CSS copied!');
+}
+
+// Init on load
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
