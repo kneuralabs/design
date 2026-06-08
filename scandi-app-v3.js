@@ -316,11 +316,6 @@ function renderPaletteDisplay(colors) {
   document.getElementById('paletteMeta').textContent = `${colors.length} colors · Click any color to copy`;
 }
 
-function copyPaletteCSS() {
-  const css = ':root {\n' + BS.palette.map((c,i)=>`  --brand-${i+1}: ${c};`).join('\n') + '\n}';
-  navigator.clipboard.writeText(css);
-  showToast('CSS copied!');
-}
 
 function applyToBrand() {
   if(BS.palette[0]) { document.getElementById('cprimary').value=BS.palette[0]; BS.colors.primary=BS.palette[0]; }
