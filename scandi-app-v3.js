@@ -204,6 +204,12 @@ function autoRecommend() {
   updateColors();
   suggestPairings();
   renderAIAdvisor();
+  // Navigate to Fonts → Mix & Match so the user sees the results
+  const navItem = document.querySelector('.nav-item[data-sec="typography"]');
+  if (navItem) showSection('typography', navItem);
+  const mixTab = document.querySelector('#typeTabs .tab:nth-child(2)');
+  if (mixTab) switchTab('typeTabs', 'typePanel', 1, mixTab);
+  showToast('Fonts suggested! See your matches below.');
 }
 
 function generateGuidelines() {
