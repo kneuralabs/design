@@ -362,7 +362,7 @@ function renderFixInputs() {
   const wrap = document.getElementById('fixInputs');
   wrap.innerHTML = fixColors.map((c,i)=>`
     <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-      <input type="color" value="${c}" style="width:44px;height:44px;padding:2px;border-radius:8px" oninput="fixColors[${i}]=this.value">
+      <input type="color" value="${c}" style="width:44px;height:44px;padding:2px;border-radius:8px" oninput="fixColors[${i}]=this.value;this.nextElementSibling.textContent=this.value">
       <span style="font-size:10px;color:var(--txt3)">${c}</span>
     </div>
   `).join('');
@@ -1140,7 +1140,7 @@ function renderLogoPreview() {
   wrap.innerHTML = `
     <div style="background:#fff;border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${svg}</div>
     <div style="background:#111;border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${svg}</div>
-    <div style="background:${BS.colors.primary};border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${svg.replace(/fill="[^"]*"/g, 'fill="#fff"').replace(/stroke="[^"]*"/g, 'stroke="#fff"')}</div>
+    <div style="background:${BS.colors.primary};border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${svg.replace(/fill="(?!none")[^"]*"/g, 'fill="#fff"').replace(/stroke="(?!none")[^"]*"/g, 'stroke="#fff"')}</div>
   `;
   renderStationeryMockup();
   renderBrandObjects(_lastBrandObj);
