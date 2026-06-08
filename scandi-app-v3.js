@@ -109,7 +109,7 @@ function showSection(id, el) {
   document.getElementById('sec-'+id).classList.add('active');
   el.classList.add('active');
   if(id==='preview') renderLivePreview('website');
-  if(id==='export') buildExports();
+  if(id==='export') { buildExports(); if(typeof buildPDFPreview==='function') buildPDFPreview(); }
   if(id==='logo') initLogoSection();
 }
 
@@ -1104,6 +1104,7 @@ JSON.stringify({
     "line-height-body": { "$value": "1.7", "$type": "lineHeight" },
   }
 }, null, 2);
+  if(typeof buildPDFPreview==='function') buildPDFPreview();
 }
 
 function copyExport(id) {
