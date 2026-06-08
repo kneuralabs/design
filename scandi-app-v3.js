@@ -876,6 +876,8 @@ function renderLivePreview(mode) {
   const name = BS.name||'Brand';
   const tagline = BS.tagline||'Your tagline here';
 
+  const logoMark = getLogoMarkup(28);
+  const isUpload = !!BS._uploadedLogoDataURL;
   if(mode==='website') {
     wrap.innerHTML = `
       <div style="border-radius:16px;overflow:hidden;border:1px solid var(--c4)">
@@ -889,7 +891,7 @@ function renderLivePreview(mode) {
         </div>
         <div style="background:${bg}">
           <nav style="padding:14px 28px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:20px">
-            <span style="${hf};font-size:16px;font-weight:700;color:#f0eff8">${name}</span>
+            ${isUpload ? logoMark : `<span style="${hf};font-size:16px;font-weight:700;color:#f0eff8">${name}</span>`}
             <div style="display:flex;gap:16px;margin-left:auto">
               ${['Product','About','Pricing'].map(l=>`<span style="${bf};font-size:12px;color:rgba(255,255,255,.5);cursor:pointer">${l}</span>`).join('')}
               <button style="background:${p};color:#fff;border:none;padding:6px 14px;border-radius:6px;${hf};font-size:12px;font-weight:600;cursor:pointer">Sign Up</button>
@@ -926,8 +928,8 @@ function renderLivePreview(mode) {
           </div>
           <div style="padding:16px 16px 24px">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-              <div style="width:36px;height:36px;border-radius:10px;background:${p};display:flex;align-items:center;justify-content:center">
-                <span style="${hf};font-size:16px;font-weight:700;color:#fff">${name[0]}</span>
+              <div style="width:36px;height:36px;border-radius:10px;background:${isUpload?'transparent':p};display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+                ${isUpload ? getLogoMarkup(28) : `<span style="${hf};font-size:16px;font-weight:700;color:#fff">${name[0]}</span>`}
               </div>
               <div>
                 <div style="${hf};font-size:14px;font-weight:600;color:#f0eff8">${name}</div>
@@ -960,12 +962,12 @@ function renderLivePreview(mode) {
           <div style="${hf};font-size:18px;font-weight:700;color:#f0eff8;line-height:1.2">${tagline}</div>
         </div>
         <div style="aspect-ratio:1;background:${p};border-radius:14px;overflow:hidden;padding:20px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
-          <div style="${hf};font-size:32px;font-weight:700;color:#fff;line-height:1">${name[0]}</div>
+          ${isUpload ? `<div style="max-height:60px;margin-bottom:8px">${getLogoMarkup(56)}</div>` : `<div style="${hf};font-size:32px;font-weight:700;color:#fff;line-height:1">${name[0]}</div>`}
           <div style="${hf};font-size:14px;font-weight:600;color:rgba(255,255,255,.9);margin-top:8px">${name}</div>
           <div style="${bf};font-size:11px;color:rgba(255,255,255,.6);margin-top:4px">${BS.industry||'Brand'}</div>
         </div>
         <div style="aspect-ratio:2/1;grid-column:1/-1;background:linear-gradient(135deg,${bg},${p}22);border-radius:14px;padding:20px;display:flex;align-items:center;gap:20px;border:1px solid rgba(255,255,255,.08)">
-          <div style="width:48px;height:48px;border-radius:12px;background:${p};flex-shrink:0"></div>
+          <div style="width:48px;height:48px;border-radius:12px;background:${isUpload?'transparent':p};flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center">${isUpload?getLogoMarkup(44):''}</div>
           <div>
             <div style="${hf};font-size:16px;font-weight:700;color:#f0eff8">${tagline}</div>
             <div style="${bf};font-size:12px;color:rgba(255,255,255,.4);margin-top:3px">Brand Story · ${name}</div>
@@ -978,6 +980,7 @@ function renderLivePreview(mode) {
         <div style="background:${p};height:4px"></div>
         <div style="flex:1;padding:40px;display:flex;align-items:center">
           <div>
+            ${isUpload ? `<div style="margin-bottom:16px">${getLogoMarkup(36)}</div>` : ''}
             <div style="${hf};font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:${p};margin-bottom:12px">COMPANY OVERVIEW</div>
             <h1 style="${hf};font-size:clamp(20px,3vw,42px);font-weight:700;color:#f0eff8;line-height:1.15;margin-bottom:14px">${name}<br><span style="color:${p}">${tagline}</span></h1>
             <p style="${bf};font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;max-width:400px">Transforming how brands are built and experienced. Professional tools for the modern creative team.</p>
@@ -1134,6 +1137,14 @@ function initLogoSection() {
   renderLogoPreview();
 }
 
+function getLogoMarkup(maxH) {
+  const h = maxH || 48;
+  if (BS._uploadedLogoDataURL) {
+    return `<img src="${BS._uploadedLogoDataURL}" style="max-height:${h}px;max-width:${h*3}px;object-fit:contain;display:block">`;
+  }
+  return BS._logoSVG || getLogoSVG();
+}
+
 function getLogoSVG() {
   const style = document.getElementById('logoStyle') ? document.getElementById('logoStyle').value : 'wordmark';
   const name = BS.name || 'Lumina';
@@ -1235,7 +1246,7 @@ function renderStationeryMockup() {
   const tagline = BS.tagline || 'Your tagline here';
   const hf = BS.fonts.heading || 'Space Grotesk';
   const bf = BS.fonts.body || 'Inter';
-  const logo = BS._logoSVG || getLogoSVG();
+  const logo = getLogoMarkup(40);
   const slug = name.toLowerCase().replace(/\s+/g,'');
 
   wrap.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
@@ -1306,7 +1317,7 @@ function renderBrandObjects(sel) {
   const wrap = document.getElementById('brandObjectsWrap');
   if (!wrap) return;
   const p = BS.colors.primary;
-  const logo = BS._logoSVG || getLogoSVG();
+  const logo = getLogoMarkup(36);
 
   const picker = `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px">
     ${BRAND_OBJECTS.map(o=>`<button class="btn btn-sm ${o.id===sel?'btn-primary':'btn-ghost'}" onclick="renderBrandObjects('${o.id}')">${o.label}</button>`).join('')}
