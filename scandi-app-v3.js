@@ -24,14 +24,19 @@ function toggleTheme() {
   setTimeout(() => html.classList.remove('theme-transitioning'), 350);
 }
 
+const SVG_SUN  = s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+const SVG_MOON = s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
 function updateToggleIcon() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  // Mobile floating button
   const btn = document.getElementById('themeToggle');
-  if (btn) {
-    btn.innerHTML = isDark 
-      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
-      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-  }
+  if (btn) btn.innerHTML = isDark ? SVG_SUN(18) : SVG_MOON(18);
+  // Sidebar icon + label
+  const icon = document.getElementById('themeIcon');
+  if (icon) icon.innerHTML = isDark ? SVG_SUN(16) : SVG_MOON(16);
+  const label = document.getElementById('themeLabel');
+  if (label) label.textContent = isDark ? 'Light mode' : 'Dark mode';
 }
 
 initTheme();
@@ -123,14 +128,19 @@ function switchTab(tabGroup, panelPrefix, idx, el) {
 // INIT
 // ═══════════════════════════════════════════════════════
 function init() {
-  renderTraits('traitsWrap',BS.traits,onTraitToggle);
-  renderTraits('fontTraitsWrap',BS.traits,onFontTraitToggle);
-  renderFontLibrary();
-  populateFontSelects();
+  // Brand section (visible on load)
+  renderTraits('traitsWrap', BS.traits, onTraitToggle);
+  renderTraits('fontTraitsWrap', BS.traits, onFontTraitToggle);
+
+  // Palette section
   generatePalette();
   generateHarmonies();
   initFixColors();
   checkContrast();
+
+  // Typography section
+  renderFontLibrary();
+  populateFontSelects();
   renderTypoPreview('website');
   renderCompare();
   renderHealthScore();
@@ -138,45 +148,55 @@ function init() {
   renderAIAdvisor();
   renderTypeScale();
   suggestPairings();
-  renderLivePreview('website');
-  buildExports();
+
+  // Preview and Export sections are rendered lazily on first navigation (showSection triggers them)
 }
 
-function renderTraits(wrId, active, cb) {
+function renderTraits(wrId, active, onToggle) {
   const wrap = document.getElementById(wrId);
-  if(!wrap) return;
-  wrap.innerHTML = TRAITS.map(t=>`
-    <span class="trait ${active.includes(t)?'on':''}" 
-      style="${active.includes(t)?'color:'+TRAIT_COLORS[t]+';border-color:'+TRAIT_COLORS[t]:''}" 
-      onclick="(${cb.toString()})(this,'${t}')" data-trait="${t}">${t}</span>
-  `).join('');
+  if (!wrap) return;
+  wrap.innerHTML = TRAITS.map(t => {
+    const on = active.includes(t);
+    return `<span class="trait ${on ? 'on' : ''}"
+      style="${on ? 'color:' + TRAIT_COLORS[t] + ';border-color:' + TRAIT_COLORS[t] : ''}"
+      data-trait="${t}">${t}</span>`;
+  }).join('');
+  wrap.onclick = e => {
+    const el = e.target.closest('[data-trait]');
+    if (el) onToggle(el, el.dataset.trait);
+  };
+}
+
+function _applyTraitToggle(el, t) {
+  const i = BS.traits.indexOf(t);
+  if (i > -1) BS.traits.splice(i, 1); else BS.traits.push(t);
+  el.classList.toggle('on');
+  if (BS.traits.includes(t)) {
+    el.style.color = TRAIT_COLORS[t];
+    el.style.borderColor = TRAIT_COLORS[t];
+  } else {
+    el.style.color = '';
+    el.style.borderColor = '';
+  }
+  suggestPairings();
 }
 
 function onTraitToggle(el, t) {
-  const i = BS.traits.indexOf(t);
-  if(i>-1) BS.traits.splice(i,1); else BS.traits.push(t);
-  el.classList.toggle('on');
-  if(BS.traits.includes(t)){el.style.color=TRAIT_COLORS[t];el.style.borderColor=TRAIT_COLORS[t];}
-  else{el.style.color='';el.style.borderColor='';}
-  suggestPairings();
+  _applyTraitToggle(el, t);
   autoRecommend();
 }
 
 function onFontTraitToggle(el, t) {
-  const i = BS.traits.indexOf(t);
-  if(i>-1) BS.traits.splice(i,1); else BS.traits.push(t);
-  el.classList.toggle('on');
-  if(BS.traits.includes(t)){el.style.color=TRAIT_COLORS[t];el.style.borderColor=TRAIT_COLORS[t];}
-  else{el.style.color='';el.style.borderColor='';}
-  suggestPairings();
+  _applyTraitToggle(el, t);
 }
 
 // ═══════════════════════════════════════════════════════
 // BRAND
 // ═══════════════════════════════════════════════════════
 function syncBrand() {
-  BS.name = document.getElementById('brandName').value || 'Lumina';
+  BS.name    = document.getElementById('brandName').value    || 'Lumina';
   BS.tagline = document.getElementById('brandTagline').value || 'Illuminate your world';
+  BS.desc    = document.getElementById('brandDesc').value    || '';
 }
 
 document.getElementById('brandIndustry').addEventListener('change', function(){
@@ -333,6 +353,7 @@ function applyToBrand() {
 
 // Fix colors
 let fixColors = ['#7c6dff','#4ecdc4','#0a0a0f'];
+let _lastBrandObj = 'tshirt';
 function initFixColors() {
   renderFixInputs();
 }
@@ -400,8 +421,7 @@ function generateHarmonies() {
   else if(type==='triadic') harmonies=[root,hslToHex((h+120)%360,s,l),hslToHex((h+240)%360,s,l)];
   else if(type==='analogous') harmonies=[hslToHex((h-30+360)%360,s,l),root,hslToHex((h+30)%360,s,l)];
   else if(type==='split') harmonies=[root,hslToHex((h+150)%360,s,l),hslToHex((h+210)%360,s,l)];
-  else if(type==='tetradic') harmonies=[root,hslToHex((h+90)%360,s,l),hslToHex((h+180)%360,s,l),hslToHex((h+270)%360,s,l)];
-  else if(type==='square') harmonies=[root,hslToHex((h+90)%360,s,l),hslToHex((h+180)%360,s,l),hslToHex((h+270)%360,s,l)];
+  else if(type==='tetradic' || type==='square') harmonies=[root,hslToHex((h+90)%360,s,l),hslToHex((h+180)%360,s,l),hslToHex((h+270)%360,s,l)];
   
   const d = document.getElementById('harmoniesDisplay');
   d.innerHTML = `
@@ -500,14 +520,14 @@ function populateFontSelects() {
 
 function updateTypoPrev() {
   BS.fonts.heading = document.getElementById('selHeading').value;
-  BS.fonts.body = document.getElementById('selBody').value;
-  BS.fonts.ui = document.getElementById('selUI').value;
-  renderTypoPreview(document.querySelector('#prevToggle .toggle-btn.active')?.dataset?.mode||'website');
+  BS.fonts.body    = document.getElementById('selBody').value;
+  BS.fonts.ui      = document.getElementById('selUI').value;
+  renderTypoPreview(document.querySelector('#prevToggle .toggle-btn.active')?.dataset?.mode || 'website');
   renderCompare();
   renderHealthScore();
   renderAIAdvisor();
   renderTypeScale();
-  buildExports();
+  // buildExports is deferred to when the user navigates to the Export section
 }
 
 function suggestPairings() {
@@ -1123,7 +1143,7 @@ function renderLogoPreview() {
     <div style="background:${BS.colors.primary};border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${svg.replace(/fill="[^"]*"/g, 'fill="#fff"').replace(/stroke="[^"]*"/g, 'stroke="#fff"')}</div>
   `;
   renderStationeryMockup();
-  renderBrandObjects(window._lastBrandObj || 'tshirt');
+  renderBrandObjects(_lastBrandObj);
 }
 
 function downloadLogo() {
@@ -1213,7 +1233,7 @@ const BRAND_OBJECTS = [
 ];
 
 function renderBrandObjects(sel) {
-  window._lastBrandObj = sel;
+  _lastBrandObj = sel;
   const wrap = document.getElementById('brandObjectsWrap');
   if (!wrap) return;
   const p = BS.colors.primary;
