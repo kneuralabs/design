@@ -222,16 +222,39 @@ function updateColors() {
 }
 
 function autoRecommend() {
-  // Generate a harmonious palette from archetype/industry and apply to brand color pickers
-  const archetypeHues = {creator:270,explorer:200,hero:0,sage:220,innocent:60,jester:40,lover:340,magician:280,outlaw:15,ruler:230,caregiver:150,everyman:30};
-  const h = archetypeHues[BS.archetype] ?? Math.floor(Math.random()*360);
-  const primary   = hslToHex(h, 65, 45);
-  const secondary = hslToHex((h+150)%360, 45, 55);
-  const accent    = hslToHex((h+30)%360, 80, 55);
-  const bg        = hslToHex(h, 15, 97);
+  // Curated palettes per archetype — primary, secondary (analogous/muted), accent (high-contrast pop), bg
+  const palettes = {
+    creator:  ['#6c47ff','#a78bfa','#f59e0b','#faf9ff'],
+    explorer: ['#0ea5e9','#38bdf8','#f97316','#f0f9ff'],
+    hero:     ['#dc2626','#f87171','#1e293b','#fff5f5'],
+    sage:     ['#1d4ed8','#60a5fa','#0d9488','#f0f4ff'],
+    innocent: ['#16a34a','#86efac','#fbbf24','#f0fdf4'],
+    jester:   ['#ea580c','#fb923c','#7c3aed','#fff7ed'],
+    lover:    ['#db2777','#f472b6','#be123c','#fff0f7'],
+    magician: ['#7c3aed','#c084fc','#06b6d4','#faf5ff'],
+    outlaw:   ['#18181b','#52525b','#ef4444','#f9f9f9'],
+    ruler:    ['#1e3a5f','#3b82f6','#c9a84c','#f8fafc'],
+    caregiver:['#059669','#34d399','#f59e0b','#f0fdf8'],
+    everyman: ['#475569','#94a3b8','#3b82f6','#f8fafc'],
+  };
+  const industry = {
+    technology:['#2563eb','#93c5fd','#06b6d4','#f0f6ff'],
+    finance:   ['#1e3a5f','#3b82f6','#c9a84c','#f8fafc'],
+    healthcare:['#0891b2','#67e8f9','#10b981','#f0fffe'],
+    education: ['#7c3aed','#c4b5fd','#f59e0b','#fdf4ff'],
+    retail:    ['#e11d48','#fda4af','#f97316','#fff1f2'],
+    food:      ['#d97706','#fcd34d','#15803d','#fffbeb'],
+    fashion:   ['#1c1917','#78716c','#d946ef','#fafaf9'],
+    creative:  ['#9333ea','#d8b4fe','#f43f5e','#fdf4ff'],
+    startup:   ['#0f172a','#6366f1','#38bdf8','#f8fafc'],
+    luxury:    ['#1c1917','#a8a29e','#c9a84c','#fafaf9'],
+  };
+  const key = BS.archetype || BS.industry || '';
+  const pal = palettes[key] || industry[BS.industry] || ['#6366f1','#a5b4fc','#f43f5e','#fafafa'];
+  const [primary, secondary, accent, bg] = pal;
   ['cprimary','csecondary','caccent','cbg'].forEach((id,i)=>{
     const el = document.getElementById(id);
-    if(el){ el.value=[primary,secondary,accent,bg][i]; el.dispatchEvent(new Event('input')); }
+    if(el){ el.value=pal[i]; el.dispatchEvent(new Event('input')); }
   });
   BS.colors.primary=primary; BS.colors.secondary=secondary; BS.colors.accent=accent; BS.colors.bg=bg;
   showToast('Colors suggested! Adjust or hit Create Brand Guide.');
