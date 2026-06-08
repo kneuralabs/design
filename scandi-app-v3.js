@@ -222,14 +222,19 @@ function updateColors() {
 }
 
 function autoRecommend() {
-  updateColors();
-  suggestPairings();
-  renderAIAdvisor();
-  const navItem = document.querySelector('.nav-item[data-sec="typography"]');
-  if (navItem) showSection('typography', navItem);
-  const mixTab = document.querySelector('#typeTabs .tab:nth-child(2)');
-  if (mixTab) switchTab('typeTabs', 'typePanel', 1, mixTab);
-  showToast('Fonts suggested! See your matches below.');
+  // Generate a harmonious palette from archetype/industry and apply to brand color pickers
+  const archetypeHues = {creator:270,explorer:200,hero:0,sage:220,innocent:60,jester:40,lover:340,magician:280,outlaw:15,ruler:230,caregiver:150,everyman:30};
+  const h = archetypeHues[BS.archetype] ?? Math.floor(Math.random()*360);
+  const primary   = hslToHex(h, 65, 45);
+  const secondary = hslToHex((h+150)%360, 45, 55);
+  const accent    = hslToHex((h+30)%360, 80, 55);
+  const bg        = hslToHex(h, 15, 97);
+  ['cprimary','csecondary','caccent','cbg'].forEach((id,i)=>{
+    const el = document.getElementById(id);
+    if(el){ el.value=[primary,secondary,accent,bg][i]; el.dispatchEvent(new Event('input')); }
+  });
+  BS.colors.primary=primary; BS.colors.secondary=secondary; BS.colors.accent=accent; BS.colors.bg=bg;
+  showToast('Colors suggested! Adjust or hit Create Brand Guide.');
 }
 
 function generateGuidelines() {
