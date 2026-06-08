@@ -929,9 +929,24 @@ textarea { resize: vertical; min-height: 88px; }
     </div>
 
     <div class="tab-panel active" id="logoPanel0">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">Upload Your Own Logo</div>
+        <p style="font-size:12px;color:var(--txt3);margin-bottom:12px">Upload a PNG, SVG, or JPG — it will be used across all mock-ups and the PDF guide.</p>
+        <div style="display:flex;align-items:center;gap:12px">
+          <label style="cursor:pointer">
+            <input type="file" id="logoUploadInput" accept="image/png,image/svg+xml,image/jpeg,image/webp" style="display:none" onchange="handleLogoUpload(this)">
+            <span class="btn btn-ghost btn-sm">Choose File</span>
+          </label>
+          <span id="logoUploadName" style="font-size:12px;color:var(--txt3)">No file chosen</span>
+          <button class="btn btn-ghost btn-sm" onclick="clearUploadedLogo()" id="logoUploadClear" style="display:none">Remove</button>
+        </div>
+        <div id="logoUploadPreview" style="margin-top:12px;display:none">
+          <img id="logoUploadImg" style="max-height:80px;border-radius:8px;background:#fff;padding:8px;box-shadow:var(--shadow-card)">
+        </div>
+      </div>
       <div class="grid-2">
         <div class="card">
-          <div class="card-title">Logo Style</div>
+          <div class="card-title">Generated Logo Style</div>
           <div class="input-group">
             <label>Style</label>
             <select id="logoStyle" onchange="renderLogoPreview()">
@@ -957,6 +972,7 @@ textarea { resize: vertical; min-height: 88px; }
           <div id="logoOutput" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;min-height:100px"></div>
         </div>
       </div>
+
     </div>
 
     <div class="tab-panel" id="logoPanel1">
@@ -1044,77 +1060,190 @@ textarea { resize: vertical; min-height: 88px; }
 <!-- PDF export lives in scandi-app-v3.js; this block only remains for buildPDFPreview -->
 <script>
 function exportPDF() {
-  const name    = BS.name    || 'Brand';
-  const tagline = BS.tagline || 'Your tagline';
-  const hf      = BS.fonts.heading || 'Space Grotesk';
-  const bf      = BS.fonts.body    || 'Inter';
-  const ui      = BS.fonts.ui      || 'IBM Plex Sans';
-  const c       = BS.colors;
-  const traits  = BS.traits   || [];
-  const arch    = BS.archetype || '';
-  const palette = BS.palette   || [];
+  const name     = BS.name     || 'Brand';
+  const tagline  = BS.tagline  || '';
+  const industry = BS.industry || '';
+  const hf       = BS.fonts.heading || 'Space Grotesk';
+  const bf       = BS.fonts.body    || 'Inter';
+  const ui       = BS.fonts.ui      || 'IBM Plex Sans';
+  const c        = BS.colors;
+  const traits   = BS.traits   || [];
+  const arch     = BS.archetype || '';
+  const palette  = BS.palette  || [];
 
-  const colorItems = Object.entries(c).map(([k,v]) =>
-    '<div style="text-align:center;margin-right:20px"><div style="width:64px;height:64px;border-radius:10px;background:'+v+';box-shadow:0 1px 4px rgba(0,0,0,0.1)"></div><div style="font-size:10px;color:#86868b;margin-top:6px;text-transform:capitalize">'+k+'</div><div style="font-size:11px;font-weight:600;color:#1d1d1f">'+v+'</div></div>'
+  // Gather logo: uploaded image takes priority, then generated SVG
+  const uploadedLogo = BS._uploadedLogoDataURL || null;
+  const generatedSVG = BS._logoSVG || '';
+  const logoHTML = uploadedLogo
+    ? '<img src=”'+uploadedLogo+'” style=”max-height:90px;max-width:200px;object-fit:contain”>'
+    : (generatedSVG ? generatedSVG : '');
+
+  // Gather any font pairings selected
+  const selectedPair = BS._selectedPair || null;
+
+  // Gather UI guidelines
+  const guidelineEl = document.getElementById('guidelinesOutput');
+  const guidelineText = guidelineEl ? guidelineEl.innerText.trim() : '';
+
+  // Gather voice/tone if present
+  const voiceEl = document.getElementById('voiceOutput');
+  const voiceText = voiceEl ? voiceEl.innerText.trim() : '';
+
+  // Build color swatches
+  const colorNames = {primary:'Primary',secondary:'Secondary',accent:'Accent',bg:'Background',text:'Text'};
+  const colorItems = Object.entries(c).map(([k,v])=>
+    '<div style=”text-align:center;margin-right:16px”><div style=”width:56px;height:56px;border-radius:10px;background:'+v+';box-shadow:0 1px 4px rgba(0,0,0,0.12)”></div>'+
+    '<div style=”font-size:9px;color:#86868b;margin-top:5px;text-transform:capitalize”>'+(colorNames[k]||k)+'</div>'+
+    '<div style=”font-size:10px;font-weight:600;color:#1d1d1f”>'+v+'</div></div>'
   ).join('');
 
-  const paletteChips = palette.length > 0
-    ? '<div style="display:flex;border-radius:10px;overflow:hidden;height:48px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin-top:16px">' + palette.map(p=>'<div style="flex:1;background:'+p+'"></div>').join('') + '</div>'
+  const paletteSection = palette.length > 0
+    ? '<div style=”margin-top:20px”><div class=”section-label”>Extended Palette</div>'+
+      '<div style=”display:flex;border-radius:10px;overflow:hidden;height:40px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin-top:8px”>'+
+      palette.map(p=>'<div style=”flex:1;background:'+p+'” title=”'+p+'”></div>').join('')+'</div>'+
+      '<div style=”display:flex;margin-top:4px;gap:4px”>'+palette.map(p=>'<div style=”flex:1;font-size:8px;color:#86868b;text-align:center”>'+p+'</div>').join('')+'</div></div>'
     : '';
 
-  const doc = '<!DOCTYPE html><html><head><title>'+name+' — Brand Guidelines</title>' +
-    '<link href="https://fonts.googleapis.com/css2?family='+hf.replace(/ /g,'+')+':wght@400;600;700&family='+bf.replace(/ /g,'+')+':wght@400;500&display=swap" rel="stylesheet">' +
-    '<style>' +
-    '@page{margin:48px 56px;size:A4}' +
-    'body{font-family:"'+bf+'",sans-serif;color:#1d1d1f;line-height:1.6;margin:0;padding:0}' +
-    '.page{page-break-after:always;padding:20px 0}' +
-    '.page:last-child{page-break-after:avoid}' +
-    'h1{font-family:"'+hf+'",sans-serif;font-size:42px;font-weight:700;letter-spacing:-1px;margin:0 0 4px}' +
-    'h2{font-family:"'+hf+'",sans-serif;font-size:22px;font-weight:700;margin:0 0 4px;letter-spacing:-0.3px}' +
-    '.section-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#86868b;margin-bottom:10px}' +
-    '.divider{height:1px;background:#e5e5e7;margin:28px 0}' +
-    '.meta{font-size:13px;color:#86868b}' +
-    '.footer{position:fixed;bottom:40px;left:56px;right:56px;font-size:10px;color:#86868b;display:flex;justify-content:space-between;border-top:1px solid #e5e5e7;padding-top:10px}' +
-    '</style></head><body>' +
-    '<div class="page">' +
-      '<div style="margin-bottom:60px"><div class="section-label">Brand Guidelines</div>' +
-      '<h1>'+name+'</h1>' +
-      '<p style="font-size:18px;color:#424245;margin:8px 0 0">“'+tagline+'”</p></div>' +
-      (arch ? '<div style="margin-bottom:32px"><div class="section-label">Brand Style</div><h2 style="text-transform:capitalize">'+arch+'</h2></div>' : '') +
-      (traits.length ? '<div style="margin-bottom:32px"><div class="section-label">Brand Personality</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+traits.map(t=>'<span style="padding:5px 14px;border:1.5px solid #1d1d1f;border-radius:20px;font-size:12px;font-weight:500">'+t+'</span>').join('')+'</div></div>' : '') +
-      '<div class="divider"></div>' +
-      '<div class="section-label">Colors</div>' +
-      '<div style="display:flex;margin-top:4px">'+colorItems+'</div>' +
-      paletteChips +
-    '</div>' +
-    '<div class="page">' +
-      '<div class="section-label">Font System</div>' +
-      '<div style="margin-bottom:32px"><h2>Heading: '+hf+'</h2><p style="font-family:\''+hf+'\';font-size:32px;font-weight:700;margin:12px 0;letter-spacing:-0.5px">The quick brown fox jumps over the lazy dog</p></div>' +
-      '<div style="margin-bottom:32px"><h2>Body: '+bf+'</h2><p style="font-family:\''+bf+'\';font-size:16px;line-height:1.7;margin:12px 0;max-width:500px">The quick brown fox jumps over the lazy dog. This is how body text appears in your brand system with proper line height and spacing.</p></div>' +
-      '<div style="margin-bottom:32px"><h2>UI: '+ui+'</h2><p style="font-family:\''+ui+'\';font-size:14px;margin:12px 0;color:#424245">Labels · Buttons · Navigation · Captions</p></div>' +
-      '<div class="divider"></div>' +
-      '<div class="section-label">How to Use</div>' +
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:13px;line-height:1.8">' +
-        '<div><h2 style="font-size:16px;margin-bottom:8px">Do</h2>' +
-        '<p>Use your main color for buttons and important actions</p>' +
-        '<p>Make sure text is easy to read against backgrounds</p>' +
-        '<p>Use '+hf+' for all headings at 600–700 weight</p>' +
-        '<p>Set '+bf+' body text at minimum 16px</p></div>' +
-        '<div><h2 style="font-size:16px;margin-bottom:8px">Don\'t</h2>' +
-        '<p style="color:#86868b">Stretch or twist the logo</p>' +
-        '<p style="color:#86868b">Use random color combos</p>' +
-        '<p style="color:#86868b">Mix heading and body fonts randomly</p>' +
-        '<p style="color:#86868b">Make printed text smaller than 12px</p></div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="footer"><span>'+name+' Brand Guidelines</span><span>Confidential</span></div>' +
+  // Typography samples
+  const typoSection =
+    '<div style=”margin-bottom:28px”><div style=”display:flex;align-items:baseline;gap:12px;margin-bottom:10px”>'+
+    '<h2 style=”margin:0”>Heading</h2><span style=”font-size:12px;color:#86868b”>'+hf+'</span></div>'+
+    '<p style=”font-family:\''+hf+'\',sans-serif;font-size:28px;font-weight:700;margin:0;letter-spacing:-0.5px;line-height:1.2”>The quick brown fox</p>'+
+    '<p style=”font-family:\''+hf+'\',sans-serif;font-size:16px;font-weight:400;margin:4px 0 0;color:#424245”>Aa Bb Cc Dd Ee Ff Gg 0 1 2 3 4 5 6 7 8 9</p></div>'+
+    '<div class=”divider”></div>'+
+    '<div style=”margin-bottom:28px”><div style=”display:flex;align-items:baseline;gap:12px;margin-bottom:10px”>'+
+    '<h2 style=”margin:0”>Body</h2><span style=”font-size:12px;color:#86868b”>'+bf+'</span></div>'+
+    '<p style=”font-family:\''+bf+'\',sans-serif;font-size:15px;line-height:1.75;margin:0;max-width:520px;color:#424245”>'+
+    name+' believes in building products that people love. Good design is honest, useful, and delightful — always in service of the people who use it.</p></div>'+
+    '<div class=”divider”></div>'+
+    '<div style=”margin-bottom:28px”><div style=”display:flex;align-items:baseline;gap:12px;margin-bottom:10px”>'+
+    '<h2 style=”margin:0”>UI / Labels</h2><span style=”font-size:12px;color:#86868b”>'+ui+'</span></div>'+
+    '<p style=”font-family:\''+ui+'\',sans-serif;font-size:12px;color:#424245;letter-spacing:0.3px”>'+
+    'Button Text &nbsp;·&nbsp; Navigation Link &nbsp;·&nbsp; Form Label &nbsp;·&nbsp; Caption &nbsp;·&nbsp; Tag</p></div>';
+
+  // Type scale
+  const typeScaleRows = [
+    ['Display','64px / 700','–1.5px'],['H1','48px / 700','–1px'],['H2','34px / 600','–0.5px'],
+    ['H3','24px / 600','0'],['Body Large','18px / 400','0'],['Body','16px / 400','0'],
+    ['Small','13px / 400','0'],['Caption','11px / 500','0.5px']
+  ].map(r=>'<tr><td style=”padding:7px 12px;font-weight:500”>'+r[0]+'</td><td style=”padding:7px 12px;color:#86868b”>'+r[1]+'</td><td style=”padding:7px 12px;color:#86868b”>'+r[2]+'</td></tr>').join('');
+
+  // Do/Don't usage rules
+  const usageSection =
+    '<div style=”display:grid;grid-template-columns:1fr 1fr;gap:28px;font-size:12px;line-height:1.9”>'+
+    '<div style=”background:#f5f5f7;border-radius:12px;padding:16px 20px”>'+
+    '<div style=”font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#34c759;margin-bottom:8px”>Do</div>'+
+    '<p>Use '+c.primary+' (Primary) for CTAs and key actions</p>'+
+    '<p>Use '+hf+' for all headlines at weight 600–700</p>'+
+    '<p>Set '+bf+' body text at minimum 16px / 1.6 line-height</p>'+
+    '<p>Maintain clear contrast — minimum 4.5:1 for body text</p>'+
+    '<p>Use the brand palette consistently across all materials</p>'+
+    '</div>'+
+    '<div style=”background:#f5f5f7;border-radius:12px;padding:16px 20px”>'+
+    '<div style=”font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ff3b30;margin-bottom:8px”>Don\'t</div>'+
+    '<p style=”color:#86868b”>Distort or recolour the logo</p>'+
+    '<p style=”color:#86868b”>Use off-brand colours not in this guide</p>'+
+    '<p style=”color:#86868b”>Mix more than two typefaces in one layout</p>'+
+    '<p style=”color:#86868b”>Place the logo on a busy or low-contrast background</p>'+
+    '<p style=”color:#86868b”>Use body fonts below 13px in digital contexts</p>'+
+    '</div></div>';
+
+  const googleFonts = [hf,bf,ui].filter((v,i,a)=>a.indexOf(v)===i)
+    .map(f=>'family='+f.replace(/ /g,'+')+'&display=swap').join('&');
+
+  const doc = '<!DOCTYPE html><html><head><meta charset=”UTF-8”>'+
+    '<title>'+name+' — Brand Guidelines</title>'+
+    '<link href=”https://fonts.googleapis.com/css2?'+googleFonts+'” rel=”stylesheet”>'+
+    '<style>'+
+    '@page{margin:44px 52px;size:A4}'+
+    'body{font-family:”'+bf+'”,sans-serif;color:#1d1d1f;line-height:1.6;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
+    '.page{page-break-after:always;padding:8px 0 40px}'+
+    '.page:last-child{page-break-after:avoid}'+
+    'h1{font-family:”'+hf+'”,sans-serif;font-size:44px;font-weight:700;letter-spacing:-1px;margin:0 0 4px;color:#1d1d1f}'+
+    'h2{font-family:”'+hf+'”,sans-serif;font-size:20px;font-weight:700;margin:0 0 4px;letter-spacing:-0.2px;color:#1d1d1f}'+
+    '.section-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#86868b;margin-bottom:10px}'+
+    '.divider{height:1px;background:#e5e5e7;margin:24px 0}'+
+    'table{width:100%;border-collapse:collapse;font-size:12px}'+
+    'th{text-align:left;padding:7px 12px;background:#f5f5f7;font-weight:600;font-size:10px;letter-spacing:0.5px;text-transform:uppercase;color:#86868b}'+
+    'tr:nth-child(even){background:#fafafa}'+
+    '.accent-bar{height:4px;border-radius:2px;background:linear-gradient(90deg,'+c.primary+','+c.secondary+','+c.accent+');margin-bottom:32px}'+
+    '.footer{position:fixed;bottom:32px;left:52px;right:52px;font-size:9px;color:#86868b;display:flex;justify-content:space-between;border-top:1px solid #e5e5e7;padding-top:8px}'+
+    '</style></head><body>'+
+
+    // ── PAGE 1: Cover ──
+    '<div class=”page”>'+
+      '<div class=”accent-bar”></div>'+
+      (logoHTML ? '<div style=”margin-bottom:28px”>'+logoHTML+'</div>' : '')+
+      '<div class=”section-label”>Brand Guidelines</div>'+
+      '<h1>'+name+'</h1>'+
+      (tagline ? '<p style=”font-size:17px;color:#424245;margin:8px 0 32px”>”'+tagline+'”</p>' : '<div style=”margin-bottom:32px”></div>')+
+      (industry ? '<div style=”margin-bottom:16px”><div class=”section-label”>Industry</div><p style=”margin:0;font-size:14px;text-transform:capitalize”>'+industry+'</p></div>' : '')+
+      (arch ? '<div style=”margin-bottom:16px”><div class=”section-label”>Brand Archetype</div><p style=”margin:0;font-size:14px;font-weight:600;text-transform:capitalize”>'+arch+'</p></div>' : '')+
+      (traits.length ? '<div style=”margin-bottom:16px”><div class=”section-label”>Personality Traits</div><div style=”display:flex;gap:8px;flex-wrap:wrap;margin-top:4px”>'+traits.map(t=>'<span style=”padding:4px 14px;border:1.5px solid #1d1d1f;border-radius:20px;font-size:11px;font-weight:500”>'+t+'</span>').join('')+'</div></div>' : '')+
+      (selectedPair ? '<div style=”margin-top:16px”><div class=”section-label”>Font Pair</div><p style=”margin:0;font-size:13px”>'+selectedPair+'</p></div>' : '')+
+    '</div>'+
+
+    // ── PAGE 2: Colors ──
+    '<div class=”page”>'+
+      '<div class=”accent-bar”></div>'+
+      '<div class=”section-label”>Color System</div>'+
+      '<h2 style=”margin-bottom:20px”>Brand Colors</h2>'+
+      '<div style=”display:flex;flex-wrap:wrap;margin-top:4px”>'+colorItems+'</div>'+
+      paletteSection+
+      '<div class=”divider”></div>'+
+      '<div class=”section-label”>Color Usage</div>'+
+      '<table><thead><tr><th>Role</th><th>Color</th><th>Hex</th><th>Use For</th></tr></thead><tbody>'+
+      '<tr><td style=”padding:7px 12px”>Primary</td><td style=”padding:7px 12px”><div style=”width:20px;height:20px;border-radius:4px;background:'+c.primary+'”></div></td><td style=”padding:7px 12px;font-family:monospace”>'+c.primary+'</td><td style=”padding:7px 12px;color:#86868b”>Buttons, links, key actions</td></tr>'+
+      '<tr><td style=”padding:7px 12px”>Secondary</td><td style=”padding:7px 12px”><div style=”width:20px;height:20px;border-radius:4px;background:'+c.secondary+'”></div></td><td style=”padding:7px 12px;font-family:monospace”>'+c.secondary+'</td><td style=”padding:7px 12px;color:#86868b”>Supporting UI, hover states</td></tr>'+
+      '<tr><td style=”padding:7px 12px”>Accent</td><td style=”padding:7px 12px”><div style=”width:20px;height:20px;border-radius:4px;background:'+c.accent+'”></div></td><td style=”padding:7px 12px;font-family:monospace”>'+c.accent+'</td><td style=”padding:7px 12px;color:#86868b”>Highlights, badges, tags</td></tr>'+
+      '<tr><td style=”padding:7px 12px”>Background</td><td style=”padding:7px 12px”><div style=”width:20px;height:20px;border-radius:4px;background:'+c.bg+';border:1px solid #e5e5e7”></div></td><td style=”padding:7px 12px;font-family:monospace”>'+c.bg+'</td><td style=”padding:7px 12px;color:#86868b”>Page backgrounds</td></tr>'+
+      (c.text ? '<tr><td style=”padding:7px 12px”>Text</td><td style=”padding:7px 12px”><div style=”width:20px;height:20px;border-radius:4px;background:'+c.text+'”></div></td><td style=”padding:7px 12px;font-family:monospace”>'+c.text+'</td><td style=”padding:7px 12px;color:#86868b”>Body copy, UI text</td></tr>' : '')+
+      '</tbody></table>'+
+    '</div>'+
+
+    // ── PAGE 3: Typography ──
+    '<div class=”page”>'+
+      '<div class=”accent-bar”></div>'+
+      '<div class=”section-label”>Typography System</div>'+
+      '<h2 style=”margin-bottom:20px”>Typefaces</h2>'+
+      typoSection+
+      '<div class=”divider”></div>'+
+      '<div class=”section-label”>Type Scale</div>'+
+      '<table style=”margin-top:8px”><thead><tr><th>Level</th><th>Size / Weight</th><th>Tracking</th></tr></thead><tbody>'+typeScaleRows+'</tbody></table>'+
+    '</div>'+
+
+    // ── PAGE 4: Logo ──
+    (logoHTML ? '<div class=”page”>'+
+      '<div class=”accent-bar”></div>'+
+      '<div class=”section-label”>Logo</div>'+
+      '<h2 style=”margin-bottom:20px”>Logo System</h2>'+
+      '<div style=”display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px”>'+
+        '<div style=”background:#ffffff;border:1px solid #e5e5e7;border-radius:12px;padding:32px 40px;display:inline-flex;align-items:center;justify-content:center”>'+logoHTML+'</div>'+
+        '<div style=”background:#1d1d1f;border-radius:12px;padding:32px 40px;display:inline-flex;align-items:center;justify-content:center”>'+logoHTML+'</div>'+
+        '<div style=”background:'+c.primary+';border-radius:12px;padding:32px 40px;display:inline-flex;align-items:center;justify-content:center”>'+logoHTML+'</div>'+
+      '</div>'+
+      '<div class=”divider”></div>'+
+      '<div class=”section-label”>Minimum Size &amp; Clear Space</div>'+
+      '<p style=”font-size:12px;color:#424245;margin:8px 0 0”>Minimum digital size: 32px height. Always maintain clear space equal to the cap-height of the wordmark around all sides.</p>'+
+    '</div>' : '')+
+
+    // ── PAGE 5: Usage Rules ──
+    '<div class=”page”>'+
+      '<div class=”accent-bar”></div>'+
+      '<div class=”section-label”>Usage Guidelines</div>'+
+      '<h2 style=”margin-bottom:20px”>Do\'s &amp; Don\'ts</h2>'+
+      usageSection+
+      (voiceText ? '<div class=”divider”></div><div class=”section-label”>Brand Voice &amp; Tone</div><p style=”font-size:12px;line-height:1.8;color:#424245;white-space:pre-wrap”>'+voiceText.slice(0,800)+'</p>' : '')+
+    '</div>'+
+
+    '<div class=”footer”><span>'+name+' — Brand Guidelines</span><span>Confidential · '+new Date().getFullYear()+'</span></div>'+
     '</body></html>';
 
   const win = window.open('', '_blank');
   if (win) {
     win.document.write(doc);
     win.document.close();
-    setTimeout(function(){ win.print(); }, 600);
+    setTimeout(function(){ win.print(); }, 800);
   }
   if (typeof showToast === 'function') showToast('PDF ready — use Print dialog to save');
 }

@@ -567,6 +567,7 @@ function applyPairing(idx) {
   document.getElementById('selHeading').value = p.h;
   document.getElementById('selBody').value = p.b;
   document.getElementById('selUI').value = p.ui;
+  BS._selectedPair = p.label ? `${p.label} — ${p.h} + ${p.b}` : `${p.h} + ${p.b}`;
   updateTypoPrev();
   showToast(`Applied: ${p.h} + ${p.b}`);
 }
@@ -1140,6 +1141,17 @@ function getLogoSVG() {
 function renderLogoPreview() {
   const wrap = document.getElementById('logoOutput');
   if (!wrap) return;
+  if (BS._uploadedLogoDataURL) {
+    const img = `<img src="${BS._uploadedLogoDataURL}" style="max-height:80px;max-width:160px;object-fit:contain">`;
+    wrap.innerHTML = `
+      <div style="background:#fff;border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${img}</div>
+      <div style="background:#111;border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${img}</div>
+      <div style="background:${BS.colors.primary};border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${img}</div>
+    `;
+    renderStationeryMockup();
+    renderBrandObjects(_lastBrandObj);
+    return;
+  }
   const svg = getLogoSVG();
   BS._logoSVG = svg;
   wrap.innerHTML = `
@@ -1149,6 +1161,35 @@ function renderLogoPreview() {
   `;
   renderStationeryMockup();
   renderBrandObjects(_lastBrandObj);
+}
+
+function handleLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    BS._uploadedLogoDataURL = e.target.result;
+    BS._uploadedLogoIsSVG = file.type === 'image/svg+xml';
+    document.getElementById('logoUploadName').textContent = file.name;
+    const preview = document.getElementById('logoUploadPreview');
+    const img = document.getElementById('logoUploadImg');
+    img.src = e.target.result;
+    preview.style.display = 'block';
+    document.getElementById('logoUploadClear').style.display = '';
+    renderLogoPreview();
+    showToast('Logo uploaded!');
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearUploadedLogo() {
+  BS._uploadedLogoDataURL = null;
+  BS._uploadedLogoIsSVG = false;
+  document.getElementById('logoUploadInput').value = '';
+  document.getElementById('logoUploadName').textContent = 'No file chosen';
+  document.getElementById('logoUploadPreview').style.display = 'none';
+  document.getElementById('logoUploadClear').style.display = 'none';
+  renderLogoPreview();
 }
 
 function downloadLogo() {
