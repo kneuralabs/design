@@ -166,6 +166,17 @@ body {
   border-color: var(--txt1);
 }
 .nav-item:hover .step-num { border-color: var(--txt2); }
+/* Done state — show checkmark, hide number */
+.nav-item.done .step-num {
+  background: var(--teal);
+  color: #fff;
+  border-color: var(--teal);
+  font-size: 0;
+}
+.nav-item.done .step-num::after {
+  content: '✓';
+  font-size: 11px;
+}
 .step-text { display: flex; flex-direction: column; min-width: 0; }
 .step-name {
   font-size: 13px; font-weight: 500; line-height: 1.2;
@@ -248,6 +259,14 @@ body {
 }
 .content-wrap { padding: 32px 48px; }
 @media (max-width: 768px) { .content-wrap { padding: 20px; } }
+
+/* ─── SECTION FOOTER ─── */
+.section-footer {
+  padding: 24px 48px 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+@media (max-width: 768px) { .section-footer { padding: 16px 20px 8px; } }
 
 /* ─── CARDS ─── */
 .card {
@@ -454,7 +473,7 @@ textarea { resize: vertical; min-height: 88px; }
 .ring-score { font-size: 28px; font-weight: 700; font-family: var(--font); color: var(--txt1); }
 .ring-label { font-size: 12px; color: var(--txt3); }
 .n-dot { width: 6px; height: 6px; background: var(--teal); border-radius: 50%; display: inline-block; margin-left: 5px; }
-.h-swatch { width: 36px; height: 36px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; transition: all 0.15s; display: inline-block; }
+.h-swatch { width: 36px; height: 36px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; transition: all 0.15px; display: inline-block; }
 .h-swatch:hover { transform: scale(1.15); border-color: var(--txt2); }
 .hero-prev { border-radius: var(--r2); overflow: hidden; border: none; box-shadow: var(--shadow-card); }
 .hp-nav { height: 48px; display: flex; align-items: center; padding: 0 20px; gap: 16px; border-bottom: 1px solid var(--c4); }
@@ -683,6 +702,9 @@ textarea { resize: vertical; min-height: 88px; }
       </div>
     </div>
   </div>
+  <div class="section-footer">
+    <button class="btn btn-primary" onclick="nextStep('palette')">Continue to Colors →</button>
+  </div>
 </section>
 
 <!-- ─── PALETTE ─── -->
@@ -718,11 +740,10 @@ textarea { resize: vertical; min-height: 88px; }
       </div>
     </div>
     <div class="tabs" id="paletteTabs">
-      <div class="tab active" onclick="switchTab('paletteTabs','palPanel',0,this)">Create</div>
-      <div class="tab" onclick="switchTab('paletteTabs','palPanel',1,this)">Check Colors</div>
-      <div class="tab" onclick="switchTab('paletteTabs','palPanel',2,this)">Find Matches</div>
-      <div class="tab" onclick="switchTab('paletteTabs','palPanel',3,this)">Readability</div>
+      <div class="tab active" onclick="switchTab('paletteTabs','palPanel',0,this)">Build</div>
+      <div class="tab" onclick="switchTab('paletteTabs','palPanel',1,this)">Analyze</div>
     </div>
+    <!-- Tab 0: Build — palette generator -->
     <div class="tab-panel active" id="palPanel0">
       <div class="grid-2">
         <div class="card">
@@ -767,17 +788,9 @@ textarea { resize: vertical; min-height: 88px; }
         </div>
       </div>
     </div>
+    <!-- Tab 1: Analyze — harmonies + contrast + fix/analyze -->
     <div class="tab-panel" id="palPanel1">
-      <div class="card">
-        <div class="card-title">Check Your Colors</div>
-        <p style="font-size:13px;color:var(--txt3);margin-bottom:14px">Add your colors to check them:</p>
-        <div id="fixInputs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"></div>
-        <button class="btn btn-ghost btn-sm" onclick="addFixColor()">+ Add Color</button>
-        <button class="btn btn-primary btn-sm" onclick="analyzeColors()" style="margin-left:8px">Check Colors</button>
-        <div id="fixReport" style="margin-top:16px"></div>
-      </div>
-    </div>
-    <div class="tab-panel" id="palPanel2">
+      <!-- Harmony tool -->
       <div class="card">
         <div class="card-title">Colors That Go Together</div>
         <div class="grid-2">
@@ -795,8 +808,7 @@ textarea { resize: vertical; min-height: 88px; }
         </div>
         <div id="harmoniesDisplay" style="margin-top:16px"></div>
       </div>
-    </div>
-    <div class="tab-panel" id="palPanel3">
+      <!-- Contrast checker -->
       <div class="card">
         <div class="card-title">Can People Read This?</div>
         <div class="grid-2">
@@ -808,7 +820,19 @@ textarea { resize: vertical; min-height: 88px; }
         <div class="card-title" style="margin-bottom:10px">Check All Colors</div>
         <div id="batchContrast"></div>
       </div>
+      <!-- Fix / Analyze tool -->
+      <div class="card">
+        <div class="card-title">Check Your Colors</div>
+        <p style="font-size:13px;color:var(--txt3);margin-bottom:14px">Add your colors to check them:</p>
+        <div id="fixInputs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"></div>
+        <button class="btn btn-ghost btn-sm" onclick="addFixColor()">+ Add Color</button>
+        <button class="btn btn-primary btn-sm" onclick="analyzeColors()" style="margin-left:8px">Check Colors</button>
+        <div id="fixReport" style="margin-top:16px"></div>
+      </div>
     </div>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-primary" onclick="nextStep('typography')">Continue to Fonts →</button>
   </div>
 </section>
 
@@ -821,11 +845,10 @@ textarea { resize: vertical; min-height: 88px; }
   <div class="content-wrap">
     <div class="tabs" id="typeTabs">
       <div class="tab active" onclick="switchTab('typeTabs','typePanel',0,this)">Browse</div>
-      <div class="tab" onclick="switchTab('typeTabs','typePanel',1,this)">Mix &amp; Match</div>
-      <div class="tab" onclick="switchTab('typeTabs','typePanel',2,this)">Preview</div>
-      <div class="tab" onclick="switchTab('typeTabs','typePanel',3,this)">Score</div>
-      <div class="tab" onclick="switchTab('typeTabs','typePanel',4,this)">Sizes</div>
+      <div class="tab" onclick="switchTab('typeTabs','typePanel',1,this)">Pair</div>
+      <div class="tab" onclick="switchTab('typeTabs','typePanel',2,this)">Preview &amp; Score</div>
     </div>
+    <!-- Tab 0: Browse -->
     <div class="tab-panel active" id="typePanel0">
       <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
         <select id="fontCatFilter" onchange="renderFontLibrary()">
@@ -851,6 +874,7 @@ textarea { resize: vertical; min-height: 88px; }
       </div>
       <div class="grid-4" id="fontLibGrid"></div>
     </div>
+    <!-- Tab 1: Pair (was Mix & Match) -->
     <div class="tab-panel" id="typePanel1">
       <div class="grid-2">
         <div class="card">
@@ -884,8 +908,15 @@ textarea { resize: vertical; min-height: 88px; }
           <div><label>Buttons &amp; Labels</label><select id="selUI" onchange="updateTypoPrev()"></select></div>
         </div>
       </div>
+      <!-- Compare Options moved here -->
+      <div class="card">
+        <div class="card-title">Compare Options</div>
+        <div class="grid-3" id="compareGrid"></div>
+      </div>
     </div>
+    <!-- Tab 2: Preview & Score (merged Preview + Score + Sizes) -->
     <div class="tab-panel" id="typePanel2">
+      <!-- Toggle row + preview -->
       <div class="toggle-row" id="prevToggle">
         <button class="toggle-btn active" onclick="switchPrevMode('website',this)">Website</button>
         <button class="toggle-btn" onclick="switchPrevMode('card',this)">Business Card</button>
@@ -893,25 +924,23 @@ textarea { resize: vertical; min-height: 88px; }
         <button class="toggle-btn" onclick="switchPrevMode('app',this)">App UI</button>
       </div>
       <div id="typographyPreview"></div>
-      <div class="card" style="margin-top:20px">
-        <div class="card-title">Compare Options</div>
-        <div class="grid-3" id="compareGrid"></div>
-      </div>
-    </div>
-    <div class="tab-panel" id="typePanel3">
-      <div class="grid-2">
+      <div class="divider"></div>
+      <!-- Score + A11y side by side -->
+      <div class="grid-2" style="margin-top:0">
         <div class="card"><div class="card-title">Font Score</div><div id="healthScore"></div></div>
         <div class="card"><div class="card-title">Easy to Read?</div><div id="a11yAnalysis"></div></div>
       </div>
       <div class="card"><div class="card-title">Why These Fonts Work</div><div id="aiAdvisor"></div></div>
-    </div>
-    <div class="tab-panel" id="typePanel4">
+      <!-- Type scale -->
       <div class="grid-2">
         <div class="card"><div class="card-title">Size Guide</div><div id="typeScale"></div></div>
         <div class="card"><div class="card-title">Font Settings</div><div id="typeSpecs"></div></div>
       </div>
       <div class="card"><div class="card-title">Sizes by Screen</div><div id="respTypo"></div></div>
     </div>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-primary" onclick="nextStep('logo')">Continue to Logo →</button>
   </div>
 </section>
 
@@ -983,6 +1012,9 @@ textarea { resize: vertical; min-height: 88px; }
     </div>
 
   </div>
+  <div class="section-footer">
+    <button class="btn btn-primary" onclick="nextStep('preview')">Continue to Preview →</button>
+  </div>
 </section>
 
 <!-- ─── PREVIEW ─── -->
@@ -992,6 +1024,8 @@ textarea { resize: vertical; min-height: 88px; }
     <p>See how your brand looks in the real world</p>
   </div>
   <div class="content-wrap">
+    <!-- Brand Summary Card — filled by renderBrandSummary() -->
+    <div id="brandSummaryBar" style="background:var(--c2);border-radius:var(--r);padding:16px 20px;box-shadow:var(--shadow-card);margin-bottom:20px;display:none"></div>
     <div class="toggle-row">
       <button class="toggle-btn active" onclick="switchLivePrev('website',this)">Website</button>
       <button class="toggle-btn" onclick="switchLivePrev('app',this)">App</button>
@@ -999,6 +1033,9 @@ textarea { resize: vertical; min-height: 88px; }
       <button class="toggle-btn" onclick="switchLivePrev('pres',this)">Presentation</button>
     </div>
     <div id="livePreviewWrap"></div>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-primary" onclick="nextStep('export')">Continue to Export →</button>
   </div>
 </section>
 
@@ -1043,6 +1080,9 @@ textarea { resize: vertical; min-height: 88px; }
         </div>
       </div>
     </div>
+  </div>
+  <div class="section-footer">
+    <button class="btn btn-primary" onclick="exportPDF()">Export PDF →</button>
   </div>
 </section>
 
@@ -1131,7 +1171,7 @@ function exportPDF() {
       '<div style="flex:1">'+
         (logoHTML ? '<div style="margin-bottom:18px;background:rgba(255,255,255,.14);border-radius:9px;padding:12px 14px;display:inline-flex">'+logoHTML+'</div>' : '')+
         '<div style="font-size:7px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:5px">Brand Guidelines</div>'+
-        '<div style="font-family:''+hf+'',sans-serif;font-size:26px;font-weight:700;color:#fff;line-height:1.1;letter-spacing:-.4px;margin-bottom:7px">'+name+'</div>'+
+        '<div style="font-family:\''+hf+'\',sans-serif;font-size:26px;font-weight:700;color:#fff;line-height:1.1;letter-spacing:-.4px;margin-bottom:7px">'+name+'</div>'+
         (tagline ? '<div style="font-size:10.5px;color:rgba(255,255,255,.65);line-height:1.5;margin-bottom:14px;font-style:italic">&#8220;'+tagline+'&#8221;</div>' : '<div style="margin-bottom:14px"></div>')+
         '<div style="height:1px;background:rgba(255,255,255,.18);margin-bottom:14px"></div>'+
         (arch ? '<div style="margin-bottom:10px"><div style="font-size:6.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:3px">Archetype</div><div style="font-size:11.5px;font-weight:600;color:#fff;text-transform:capitalize">'+arch+'</div></div>' : '')+
@@ -1166,7 +1206,7 @@ function exportPDF() {
         '</div>'
       : '')+
       '<div class="sec" style="flex:1">'+
-        '<div class="stl">Do's &amp; Don'ts</div>'+
+        '<div class="stl">Do\'s &amp; Don\'ts</div>'+
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:8.5px;line-height:1.75">'+
           '<div>'+
             '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#34c759;margin-bottom:4px">&#10003; Do</div>'+
@@ -1176,7 +1216,7 @@ function exportPDF() {
             '<div style="color:#424245">4.5:1 contrast ratio</div>'+
           '</div>'+
           '<div>'+
-            '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ff3b30;margin-bottom:4px">&#10005; Don't</div>'+
+            '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ff3b30;margin-bottom:4px">&#10005; Don\'t</div>'+
             '<div style="color:#aeaeb2;margin-bottom:2px">Distort the logo</div>'+
             '<div style="color:#aeaeb2;margin-bottom:2px">Use off-brand colours</div>'+
             '<div style="color:#aeaeb2;margin-bottom:2px">Mix 3+ typefaces</div>'+
@@ -1192,28 +1232,28 @@ function exportPDF() {
         '<div class="stl">Typography</div>'+
         '<div style="margin-bottom:8px">'+
           '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aeaeb2;margin-bottom:2px">Heading · '+hf+'</div>'+
-          '<div style="font-family:''+hf+'',sans-serif;font-size:20px;font-weight:700;color:#1d1d1f;line-height:1.1;letter-spacing:-.3px">'+name+'</div>'+
-          '<div style="font-family:''+hf+'',sans-serif;font-size:10px;color:#6e6e73;margin-top:2px">Aa Bb Cc 0 1 2 3 4 5</div>'+
+          '<div style="font-family:\''+hf+'\',sans-serif;font-size:20px;font-weight:700;color:#1d1d1f;line-height:1.1;letter-spacing:-.3px">'+name+'</div>'+
+          '<div style="font-family:\''+hf+'\',sans-serif;font-size:10px;color:#6e6e73;margin-top:2px">Aa Bb Cc 0 1 2 3 4 5</div>'+
         '</div>'+
         '<div class="rule"></div>'+
         '<div style="margin-bottom:8px">'+
           '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aeaeb2;margin-bottom:2px">Body · '+bf+'</div>'+
-          '<div style="font-family:''+bf+'',sans-serif;font-size:9.5px;line-height:1.65;color:#424245">Good design is honest and useful — always in service of the people who use it.</div>'+
+          '<div style="font-family:\''+bf+'\',sans-serif;font-size:9.5px;line-height:1.65;color:#424245">Good design is honest and useful — always in service of the people who use it.</div>'+
         '</div>'+
         '<div class="rule"></div>'+
         '<div>'+
           '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aeaeb2;margin-bottom:2px">UI · '+ui+'</div>'+
-          '<div style="font-family:''+ui+'',sans-serif;font-size:8.5px;color:#6e6e73;letter-spacing:.2px">Button · Label · Nav · Caption</div>'+
+          '<div style="font-family:\''+ui+'\',sans-serif;font-size:8.5px;color:#6e6e73;letter-spacing:.2px">Button · Label · Nav · Caption</div>'+
         '</div>'+
       '</div>'+
       '<div class="sec">'+
         '<div class="stl">Type Scale</div>'+
         '<div style="display:grid;grid-template-columns:auto 1fr auto;gap:3px 10px;align-items:baseline">'+
-          '<span style="font-family:''+hf+'',sans-serif;font-size:18px;font-weight:700;color:#1d1d1f;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">Display · 700</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">48–64px</span>'+
-          '<span style="font-family:''+hf+'',sans-serif;font-size:13px;font-weight:700;color:#1d1d1f;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">Heading · 700</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">28–40px</span>'+
-          '<span style="font-family:''+hf+'',sans-serif;font-size:10px;font-weight:600;color:#1d1d1f;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">Subheading · 600</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">18–24px</span>'+
-          '<span style="font-family:''+bf+'',sans-serif;font-size:8.5px;color:#424245;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">Body · 400</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">14–16px</span>'+
-          '<span style="font-family:''+ui+'',sans-serif;font-size:7.5px;color:#6e6e73;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">UI Label · 500</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">11–13px</span>'+
+          '<span style="font-family:\''+hf+'\',sans-serif;font-size:18px;font-weight:700;color:#1d1d1f;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">Display · 700</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">48–64px</span>'+
+          '<span style="font-family:\''+hf+'\',sans-serif;font-size:13px;font-weight:700;color:#1d1d1f;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">Heading · 700</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">28–40px</span>'+
+          '<span style="font-family:\''+hf+'\',sans-serif;font-size:10px;font-weight:600;color:#1d1d1f;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">Subheading · 600</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">18–24px</span>'+
+          '<span style="font-family:\''+bf+'\',sans-serif;font-size:8.5px;color:#424245;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">Body · 400</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">14–16px</span>'+
+          '<span style="font-family:\''+ui+'\',sans-serif;font-size:7.5px;color:#6e6e73;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">UI Label · 500</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">11–13px</span>'+
         '</div>'+
       '</div>'+
       (arch || BS._selectedPair || traits.length ?
@@ -1257,8 +1297,8 @@ function buildPDFPreview() {
       '<div style="flex-shrink:0;width:100px">'+
         (logoHTML ? '<div style="background:rgba(255,255,255,.14);border-radius:7px;padding:8px;margin-bottom:8px;display:inline-flex">'+logoHTML+'</div>' : '')+
         '<div style="font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:3px">Brand</div>'+
-        '<div style="font-family:''+hf+'',sans-serif;font-size:16px;font-weight:700;color:#fff;line-height:1.1;letter-spacing:-.3px;margin-bottom:4px">'+name+'</div>'+
-        (tagline ? '<div style="font-size:8px;color:rgba(255,255,255,.6);font-style:italic;line-height:1.4">“'+tagline+'”</div>' : '')+
+        '<div style="font-family:\''+hf+'\',sans-serif;font-size:16px;font-weight:700;color:#fff;line-height:1.1;letter-spacing:-.3px;margin-bottom:4px">'+name+'</div>'+
+        (tagline ? '<div style="font-size:8px;color:rgba(255,255,255,.6);font-style:italic;line-height:1.4">"'+tagline+'"</div>' : '')+
       '</div>'+
       '<div style="flex:1;display:flex;flex-direction:column;gap:8px">'+
         '<div style="background:#fff;border-radius:7px;padding:10px 12px">'+
@@ -1272,8 +1312,8 @@ function buildPDFPreview() {
         '</div>'+
         '<div style="background:#fff;border-radius:7px;padding:10px 12px">'+
           '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6e6e73;margin-bottom:5px">Typography</div>'+
-          '<div style="font-family:''+hf+'',sans-serif;font-size:13px;font-weight:700;color:#1d1d1f;line-height:1;margin-bottom:3px">'+name+'</div>'+
-          '<div style="font-family:''+bf+'',sans-serif;font-size:8px;color:#6e6e73;line-height:1.5">'+hf+' &nbsp;·&nbsp; '+bf+'</div>'+
+          '<div style="font-family:\''+hf+'\',sans-serif;font-size:13px;font-weight:700;color:#1d1d1f;line-height:1;margin-bottom:3px">'+name+'</div>'+
+          '<div style="font-family:\''+bf+'\',sans-serif;font-size:8px;color:#6e6e73;line-height:1.5">'+hf+' &nbsp;·&nbsp; '+bf+'</div>'+
         '</div>'+
       '</div>'+
     '</div>';
