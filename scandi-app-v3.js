@@ -1,4 +1,3 @@
-
 // ═══════════════════════════════════════════════════════
 // DARK MODE TOGGLE
 // ═══════════════════════════════════════════════════════
@@ -50,6 +49,7 @@ const BS = {
   colors: { primary:'#7c6dff', secondary:'#4ecdc4', accent:'#d4a853', bg:'#0a0a0f', text:'#f0eff8' },
   fonts: { heading:'Space Grotesk', body:'Inter', ui:'IBM Plex Sans' },
   palette: [],
+  _logoSVG: '',
 };
 
 const FONT_DB = [
@@ -105,6 +105,7 @@ function showSection(id, el) {
   el.classList.add('active');
   if(id==='preview') renderLivePreview('website');
   if(id==='export') buildExports();
+  if(id==='logo') initLogoSection();
 }
 
 function switchTab(tabGroup, panelPrefix, idx, el) {
@@ -204,7 +205,6 @@ function autoRecommend() {
   updateColors();
   suggestPairings();
   renderAIAdvisor();
-  // Navigate to Fonts → Mix & Match so the user sees the results
   const navItem = document.querySelector('.nav-item[data-sec="typography"]');
   if (navItem) showSection('typography', navItem);
   const mixTab = document.querySelector('#typeTabs .tab:nth-child(2)');
@@ -1074,6 +1074,179 @@ function copyPaletteCSS() {
   const css = BS.palette.map((c,i)=>`--color-${i+1}: ${c};`).join('\n');
   navigator.clipboard.writeText(`:root {\n${css}\n}`);
   showToast('Palette CSS copied!');
+}
+
+// ═══════════════════════════════════════════════════════
+// LOGO CREATOR
+// ═══════════════════════════════════════════════════════
+function initLogoSection() {
+  const lc = document.getElementById('logoColor');
+  if (lc) lc.value = BS.colors.primary;
+  renderLogoPreview();
+}
+
+function getLogoSVG() {
+  const style = document.getElementById('logoStyle') ? document.getElementById('logoStyle').value : 'wordmark';
+  const name = BS.name || 'Lumina';
+  const p = document.getElementById('logoColor') ? document.getElementById('logoColor').value : BS.colors.primary;
+  const hf = BS.fonts.heading || 'Space Grotesk';
+  const initial = name[0].toUpperCase();
+  const w = Math.max(name.length * 26 + 20, 80);
+
+  if (style === 'wordmark') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} 56" width="${w}" height="56"><text x="4" y="42" font-family="${hf},sans-serif" font-size="40" font-weight="700" fill="${p}">${name}</text></svg>`;
+  }
+  if (style === 'monogram') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><rect width="72" height="72" rx="16" fill="${p}"/><text x="36" y="50" text-anchor="middle" font-family="${hf},sans-serif" font-size="38" font-weight="700" fill="#fff">${initial}</text></svg>`;
+  }
+  if (style === 'badge') {
+    const bw = Math.max(name.length * 14 + 56, 100);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${bw} 56" width="${bw}" height="56"><rect width="${bw}" height="56" rx="28" fill="${p}"/><text x="${bw/2}" y="35" text-anchor="middle" font-family="${hf},sans-serif" font-size="22" font-weight="700" fill="#fff">${name}</text></svg>`;
+  }
+  if (style === 'emblem') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110" width="110" height="110"><polygon points="55,5 105,30 105,80 55,105 5,80 5,30" fill="${p}"/><text x="55" y="50" text-anchor="middle" font-family="${hf},sans-serif" font-size="28" font-weight="700" fill="#fff">${initial}</text><text x="55" y="68" text-anchor="middle" font-family="${hf},sans-serif" font-size="8" font-weight="600" fill="rgba(255,255,255,0.75)" letter-spacing="2">${name.toUpperCase().slice(0,8)}</text></svg>`;
+  }
+  if (style === 'letterform') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 90" width="90" height="90"><circle cx="45" cy="45" r="42" fill="none" stroke="${p}" stroke-width="4"/><text x="45" y="65" text-anchor="middle" font-family="${hf},sans-serif" font-size="54" font-weight="700" fill="${p}">${initial}</text></svg>`;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} 56" width="${w}" height="56"><text x="4" y="42" font-family="${hf},sans-serif" font-size="40" font-weight="700" fill="${p}">${name}</text></svg>`;
+}
+
+function renderLogoPreview() {
+  const wrap = document.getElementById('logoOutput');
+  if (!wrap) return;
+  const svg = getLogoSVG();
+  BS._logoSVG = svg;
+  wrap.innerHTML = `
+    <div style="background:#fff;border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${svg}</div>
+    <div style="background:#111;border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${svg}</div>
+    <div style="background:${BS.colors.primary};border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${svg.replace(/fill="[^"]*"/g, 'fill="#fff"').replace(/stroke="[^"]*"/g, 'stroke="#fff"')}</div>
+  `;
+  renderStationeryMockup();
+  renderBrandObjects(window._lastBrandObj || 'tshirt');
+}
+
+function downloadLogo() {
+  const svg = BS._logoSVG || getLogoSVG();
+  const blob = new Blob([svg], {type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (BS.name||'logo').toLowerCase().replace(/\s+/g,'-') + '.svg';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('SVG downloaded!');
+}
+
+function renderStationeryMockup() {
+  const wrap = document.getElementById('stationeryMockup');
+  if (!wrap) return;
+  const p = BS.colors.primary;
+  const name = BS.name || 'Lumina';
+  const tagline = BS.tagline || 'Your tagline here';
+  const hf = BS.fonts.heading || 'Space Grotesk';
+  const bf = BS.fonts.body || 'Inter';
+  const logo = BS._logoSVG || getLogoSVG();
+  const slug = name.toLowerCase().replace(/\s+/g,'');
+
+  wrap.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
+
+    <div>
+      <div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Business Card</div>
+      <div style="width:100%;max-width:320px;aspect-ratio:1.75;background:#fff;border-radius:10px;padding:18px 20px;box-shadow:0 4px 24px rgba(0,0,0,.13);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between">
+        <div style="position:absolute;bottom:-24px;right:-24px;width:96px;height:96px;background:${p};border-radius:50%;opacity:.1"></div>
+        <div style="max-width:55%;overflow:hidden">${logo}</div>
+        <div>
+          <div style="font-family:'${hf}',sans-serif;font-size:12px;font-weight:600;color:#1d1d1f">Creative Director</div>
+          <div style="font-family:'${bf}',sans-serif;font-size:10px;color:#86868b;margin-top:2px">hello@${slug}.com</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Letterhead (A4)</div>
+      <div style="width:100%;max-width:200px;aspect-ratio:.707;background:#fff;border-radius:8px;padding:14px;box-shadow:0 4px 24px rgba(0,0,0,.13);overflow:hidden">
+        <div style="height:3px;background:${p};border-radius:2px;margin-bottom:10px"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+          <div style="max-width:55%;overflow:hidden">${logo}</div>
+          <div style="font-family:'${bf}',sans-serif;font-size:6px;color:#86868b;text-align:right;line-height:1.8">${name}<br>${tagline}<br>${slug}.com</div>
+        </div>
+        ${[100,80,95,70,88,75].map(w=>`<div style="height:4px;background:#f0f0f0;border-radius:2px;margin-bottom:4px;width:${w}%"></div>`).join('')}
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Envelope (DL)</div>
+      <div style="width:100%;max-width:300px;aspect-ratio:2.15;background:#fff;border-radius:8px;padding:14px 18px;box-shadow:0 4px 24px rgba(0,0,0,.13);position:relative;overflow:hidden;display:flex;align-items:center;gap:10px">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${p}"></div>
+        <div style="max-width:44%;overflow:hidden">${logo}</div>
+        <div>
+          <div style="font-family:'${hf}',sans-serif;font-size:10px;font-weight:600;color:#1d1d1f">${name}</div>
+          <div style="font-family:'${bf}',sans-serif;font-size:8px;color:#86868b;margin-top:2px">${tagline}</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Email Signature</div>
+      <div style="width:100%;max-width:320px;background:#fff;border-radius:8px;padding:14px 18px;box-shadow:0 4px 24px rgba(0,0,0,.13);border-left:3px solid ${p}">
+        <div style="max-width:50%;overflow:hidden;margin-bottom:8px">${logo}</div>
+        <div style="font-family:'${hf}',sans-serif;font-size:11px;font-weight:600;color:#1d1d1f">Jane Smith · Creative Director</div>
+        <div style="font-family:'${bf}',sans-serif;font-size:10px;color:#86868b;margin-top:2px">${slug}.com · hello@${slug}.com</div>
+      </div>
+    </div>
+
+  </div>`;
+}
+
+const BRAND_OBJECTS = [
+  {id:'tshirt',   label:'T-Shirt'},
+  {id:'hoodie',   label:'Hoodie'},
+  {id:'bottle',   label:'Water Bottle'},
+  {id:'tote',     label:'Tote Bag'},
+  {id:'mug',      label:'Mug'},
+  {id:'cap',      label:'Snapback Cap'},
+  {id:'notebook', label:'Notebook'},
+  {id:'phone',    label:'Phone Case'},
+  {id:'box',      label:'Kraft Box'},
+  {id:'sticker',  label:'Sticker Sheet'},
+];
+
+function renderBrandObjects(sel) {
+  window._lastBrandObj = sel;
+  const wrap = document.getElementById('brandObjectsWrap');
+  if (!wrap) return;
+  const p = BS.colors.primary;
+  const logo = BS._logoSVG || getLogoSVG();
+
+  const picker = `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px">
+    ${BRAND_OBJECTS.map(o=>`<button class="btn btn-sm ${o.id===sel?'btn-primary':'btn-ghost'}" onclick="renderBrandObjects('${o.id}')">${o.label}</button>`).join('')}
+  </div>`;
+
+  const logoOverlay = `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:70px;overflow:hidden;opacity:.95">${logo}</div>`;
+
+  const shapes = {
+    tshirt:   `<svg width="220" height="240" viewBox="0 0 220 240"><path d="M62 22L18 62l34 12v148h112V74l34-12L154 22Q128 44 110 44Q92 44 62 22Z" fill="${p}" opacity=".9"/><path d="M62 22Q92 44 110 44Q128 44 154 22" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5"/></svg>`,
+    hoodie:   `<svg width="220" height="256" viewBox="0 0 220 256"><path d="M58 30Q36 42 16 72l34 10v166h120V82l34-10Q184 42 162 30Q138 56 110 58Q82 56 58 30Z" fill="${p}" opacity=".9"/><path d="M88 58Q110 66 110 58Q110 66 132 58" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="3" stroke-linecap="round"/><rect x="88" y="55" width="44" height="14" rx="7" fill="rgba(0,0,0,.15)"/></svg>`,
+    bottle:   `<svg width="96" height="240" viewBox="0 0 96 240"><rect x="30" y="6" width="36" height="22" rx="8" fill="${p}" opacity=".7"/><path d="M20 52Q14 64 14 82V210Q14 226 48 226Q82 226 82 210V82Q82 64 76 52L62 28H34Z" fill="${p}" opacity=".9"/></svg>`,
+    tote:     `<svg width="196" height="218" viewBox="0 0 196 218"><path d="M40 60Q60 16 98 16Q136 16 156 60L172 200Q172 214 98 214Q24 214 24 200Z" fill="${p}" opacity=".88"/><path d="M68 16Q68 2 98 2Q128 2 128 16" fill="none" stroke="${p}" stroke-width="7" stroke-linecap="round"/></svg>`,
+    mug:      `<svg width="176" height="176" viewBox="0 0 176 176"><path d="M22 42L32 156Q32 168 88 168Q144 168 144 156L154 42Z" fill="${p}" opacity=".9"/><path d="M144 62Q170 62 170 88Q170 114 144 114" fill="none" stroke="${p}" stroke-width="10" stroke-linecap="round" opacity=".55"/><rect x="22" y="42" width="132" height="11" rx="4" fill="rgba(255,255,255,.14)"/></svg>`,
+    cap:      `<svg width="218" height="156" viewBox="0 0 218 156"><path d="M22 98Q22 36 109 26Q196 36 196 98Z" fill="${p}" opacity=".9"/><path d="M10 108Q10 120 109 120Q208 120 208 108L196 98L22 98Z" fill="${p}" opacity=".7"/></svg>`,
+    notebook: `<svg width="168" height="228" viewBox="0 0 168 228"><rect x="16" y="8" width="136" height="212" rx="10" fill="${p}" opacity=".9"/><rect x="16" y="8" width="14" height="212" rx="5" fill="rgba(0,0,0,.18)"/>${[28,44,60,76].map(y=>`<rect x="38" y="${y}" width="100" height="2" rx="1" fill="rgba(255,255,255,.13)"/>`).join('')}</svg>`,
+    phone:    `<svg width="138" height="258" viewBox="0 0 138 258"><rect x="5" y="5" width="128" height="248" rx="24" fill="${p}" opacity=".9"/><rect x="15" y="15" width="108" height="228" rx="18" fill="rgba(0,0,0,.14)"/><rect x="44" y="7" width="50" height="8" rx="4" fill="rgba(0,0,0,.28)"/></svg>`,
+    box:      `<svg width="198" height="208" viewBox="0 0 198 208"><rect x="26" y="66" width="146" height="126" rx="6" fill="${p}" opacity=".9"/><polygon points="26,66 99,34 172,66" fill="${p}" opacity=".72"/><polygon points="26,66 99,96 172,66" fill="rgba(0,0,0,.12)"/><line x1="99" y1="34" x2="99" y2="192" stroke="rgba(255,255,255,.14)" stroke-width="1"/></svg>`,
+    sticker:  `<svg width="200" height="200" viewBox="0 0 200 200">${[0,1,2,3,4,5,6,7,8].map(i=>{
+      const x=20+(i%3)*62, y=20+Math.floor(i/3)*62;
+      return `<circle cx="${x+26}" cy="${y+26}" r="26" fill="${p}" opacity="${.5+i*.05}"/>`;
+    }).join('')}</svg>`,
+  };
+
+  wrap.innerHTML = picker + `<div style="display:flex;justify-content:center;align-items:center;padding:36px;background:var(--c3);border-radius:var(--r2);min-height:300px">
+    <div style="position:relative;display:inline-block">
+      ${shapes[sel] || shapes.tshirt}
+      ${logoOverlay}
+    </div>
+  </div>`;
 }
 
 // Init on load
