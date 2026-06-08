@@ -1015,7 +1015,7 @@ textarea { resize: vertical; min-height: 88px; }
       <div class="tab" onclick="switchTab('expTabs','expPanel',1,this)">Tailwind</div>
       <div class="tab" onclick="switchTab('expTabs','expPanel',2,this)">Data File</div>
       <div class="tab" onclick="switchTab('expTabs','expPanel',3,this)">Figma</div>
-      <div class="tab" onclick="switchTab('expTabs','expPanel',4,this)">PDF Guide</div>
+      <div class="tab" onclick="switchTab('expTabs','expPanel',4,this);buildPDFPreview()">PDF Guide</div>
     </div>
     <div class="tab-panel active" id="expPanel0">
       <div class="card"><div class="card-title">CSS Code</div><pre class="code-block" id="cssExport"></pre><div class="btn-row"><button class="btn btn-primary btn-sm" onclick="copyExport('cssExport')">Copy CSS</button></div></div>
@@ -1057,189 +1057,182 @@ textarea { resize: vertical; min-height: 88px; }
 
 <div class="toast" id="toast"></div>
 
-<!-- PDF export lives in scandi-app-v3.js; this block only remains for buildPDFPreview -->
+<!-- PDF export -->
 <script>
 function exportPDF() {
-  const name     = BS.name     || 'Brand';
-  const tagline  = BS.tagline  || '';
-  const industry = BS.industry || '';
-  const hf       = BS.fonts.heading || 'Space Grotesk';
-  const bf       = BS.fonts.body    || 'Inter';
-  const ui       = BS.fonts.ui      || 'IBM Plex Sans';
-  const c        = BS.colors;
-  const traits   = BS.traits   || [];
-  const arch     = BS.archetype || '';
-  const palette  = BS.palette  || [];
+  var name    = BS.name     || 'Brand';
+  var tagline = BS.tagline  || '';
+  var industry= BS.industry || '';
+  var hf      = BS.fonts.heading || 'Space Grotesk';
+  var bf      = BS.fonts.body    || 'Inter';
+  var ui      = BS.fonts.ui      || 'IBM Plex Sans';
+  var c       = BS.colors;
+  var traits  = BS.traits   || [];
+  var arch    = BS.archetype || '';
+  var palette = BS.palette  || [];
 
-  // Gather logo: uploaded image takes priority, then generated SVG
-  const uploadedLogo = BS._uploadedLogoDataURL || null;
-  const generatedSVG = BS._logoSVG || '';
-  const logoHTML = uploadedLogo
-    ? '<img src=”'+uploadedLogo+'” style=”max-height:90px;max-width:200px;object-fit:contain”>'
-    : (generatedSVG ? generatedSVG : '');
+  var logoHTML = BS._uploadedLogoDataURL
+    ? '<img src="'+BS._uploadedLogoDataURL+'" style="max-height:60px;max-width:160px;object-fit:contain;display:block">'
+    : (BS._logoSVG || '');
 
-  // Gather any font pairings selected
-  const selectedPair = BS._selectedPair || null;
+  var gf = [hf,bf,ui].filter(function(v,i,a){return a.indexOf(v)===i;})
+    .map(function(f){return 'family='+f.replace(/ /g,'+')+':wght@400;500;600;700';}).join('&');
 
-  // Gather UI guidelines
-  const guidelineEl = document.getElementById('guidelinesOutput');
-  const guidelineText = guidelineEl ? guidelineEl.innerText.trim() : '';
+  var colorDefs = [
+    {k:'primary',  label:'Primary',    use:'CTAs & key actions'},
+    {k:'secondary',label:'Secondary',  use:'Supporting UI'},
+    {k:'accent',   label:'Accent',     use:'Highlights & tags'},
+    {k:'bg',       label:'Background', use:'Page surfaces'},
+    {k:'text',     label:'Text',       use:'Body copy'},
+  ].filter(function(d){return c[d.k];});
 
-  // Gather voice/tone if present
-  const voiceEl = document.getElementById('voiceOutput');
-  const voiceText = voiceEl ? voiceEl.innerText.trim() : '';
+  var swatches = colorDefs.map(function(d){
+    return '<div style="flex:1;min-width:0">'+
+      '<div style="height:44px;border-radius:7px 7px 0 0;background:'+c[d.k]+
+        (d.k==='bg'?';border:1px solid rgba(0,0,0,.06)':'')+
+        ';-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>'+
+      '<div style="background:#fff;border:1px solid #e8e8ed;border-top:none;border-radius:0 0 7px 7px;padding:5px 7px">'+
+        '<div style="font-size:8.5px;font-weight:700;color:#1d1d1f">'+d.label+'</div>'+
+        '<div style="font-family:monospace;font-size:7.5px;color:#6e6e73;margin-top:1px">'+c[d.k]+'</div>'+
+        '<div style="font-size:7px;color:#aeaeb2;margin-top:1px;line-height:1.3">'+d.use+'</div>'+
+      '</div></div>';
+  }).join('');
 
-  // Build color swatches
-  const colorNames = {primary:'Primary',secondary:'Secondary',accent:'Accent',bg:'Background',text:'Text'};
-  const colorItems = Object.entries(c).map(([k,v])=>
-    '<div style=”text-align:center;margin-right:16px”><div style=”width:56px;height:56px;border-radius:10px;background:'+v+';box-shadow:0 1px 4px rgba(0,0,0,0.12)”></div>'+
-    '<div style=”font-size:9px;color:#86868b;margin-top:5px;text-transform:capitalize”>'+(colorNames[k]||k)+'</div>'+
-    '<div style=”font-size:10px;font-weight:600;color:#1d1d1f”>'+v+'</div></div>'
-  ).join('');
-
-  const paletteSection = palette.length > 0
-    ? '<div style=”margin-top:20px”><div class=”section-label”>Extended Palette</div>'+
-      '<div style=”display:flex;border-radius:10px;overflow:hidden;height:40px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin-top:8px”>'+
-      palette.map(p=>'<div style=”flex:1;background:'+p+'” title=”'+p+'”></div>').join('')+'</div>'+
-      '<div style=”display:flex;margin-top:4px;gap:4px”>'+palette.map(p=>'<div style=”flex:1;font-size:8px;color:#86868b;text-align:center”>'+p+'</div>').join('')+'</div></div>'
+  var palStrip = palette.length > 0
+    ? '<div style="margin-top:8px"><div style="display:flex;border-radius:5px;overflow:hidden;height:16px;-webkit-print-color-adjust:exact;print-color-adjust:exact">'+
+      palette.map(function(p){return '<div style="flex:1;background:'+p+'"></div>';}).join('')+'</div>'+
+      '<div style="display:flex;margin-top:2px">'+
+      palette.map(function(p){return '<div style="flex:1;font-family:monospace;font-size:6px;color:#aeaeb2;text-align:center">'+p+'</div>';}).join('')+'</div></div>'
     : '';
 
-  // Typography samples
-  const typoSection =
-    '<div style=”margin-bottom:28px”><div style=”display:flex;align-items:baseline;gap:12px;margin-bottom:10px”>'+
-    '<h2 style=”margin:0”>Heading</h2><span style=”font-size:12px;color:#86868b”>'+hf+'</span></div>'+
-    '<p style=”font-family:\''+hf+'\',sans-serif;font-size:28px;font-weight:700;margin:0;letter-spacing:-0.5px;line-height:1.2”>The quick brown fox</p>'+
-    '<p style=”font-family:\''+hf+'\',sans-serif;font-size:16px;font-weight:400;margin:4px 0 0;color:#424245”>Aa Bb Cc Dd Ee Ff Gg 0 1 2 3 4 5 6 7 8 9</p></div>'+
-    '<div class=”divider”></div>'+
-    '<div style=”margin-bottom:28px”><div style=”display:flex;align-items:baseline;gap:12px;margin-bottom:10px”>'+
-    '<h2 style=”margin:0”>Body</h2><span style=”font-size:12px;color:#86868b”>'+bf+'</span></div>'+
-    '<p style=”font-family:\''+bf+'\',sans-serif;font-size:15px;line-height:1.75;margin:0;max-width:520px;color:#424245”>'+
-    name+' believes in building products that people love. Good design is honest, useful, and delightful — always in service of the people who use it.</p></div>'+
-    '<div class=”divider”></div>'+
-    '<div style=”margin-bottom:28px”><div style=”display:flex;align-items:baseline;gap:12px;margin-bottom:10px”>'+
-    '<h2 style=”margin:0”>UI / Labels</h2><span style=”font-size:12px;color:#86868b”>'+ui+'</span></div>'+
-    '<p style=”font-family:\''+ui+'\',sans-serif;font-size:12px;color:#424245;letter-spacing:0.3px”>'+
-    'Button Text &nbsp;·&nbsp; Navigation Link &nbsp;·&nbsp; Form Label &nbsp;·&nbsp; Caption &nbsp;·&nbsp; Tag</p></div>';
+  var traitPills = traits.map(function(t){
+    return '<span style="display:inline-block;padding:2px 8px;border:1px solid rgba(255,255,255,.3);border-radius:20px;font-size:7.5px;font-weight:500;color:rgba(255,255,255,.85);margin:2px 3px 2px 0">'+t+'</span>';
+  }).join('');
 
-  // Type scale
-  const typeScaleRows = [
-    ['Display','64px / 700','–1.5px'],['H1','48px / 700','–1px'],['H2','34px / 600','–0.5px'],
-    ['H3','24px / 600','0'],['Body Large','18px / 400','0'],['Body','16px / 400','0'],
-    ['Small','13px / 400','0'],['Caption','11px / 500','0.5px']
-  ].map(r=>'<tr><td style=”padding:7px 12px;font-weight:500”>'+r[0]+'</td><td style=”padding:7px 12px;color:#86868b”>'+r[1]+'</td><td style=”padding:7px 12px;color:#86868b”>'+r[2]+'</td></tr>').join('');
-
-  // Do/Don't usage rules
-  const usageSection =
-    '<div style=”display:grid;grid-template-columns:1fr 1fr;gap:28px;font-size:12px;line-height:1.9”>'+
-    '<div style=”background:#f5f5f7;border-radius:12px;padding:16px 20px”>'+
-    '<div style=”font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#34c759;margin-bottom:8px”>Do</div>'+
-    '<p>Use '+c.primary+' (Primary) for CTAs and key actions</p>'+
-    '<p>Use '+hf+' for all headlines at weight 600–700</p>'+
-    '<p>Set '+bf+' body text at minimum 16px / 1.6 line-height</p>'+
-    '<p>Maintain clear contrast — minimum 4.5:1 for body text</p>'+
-    '<p>Use the brand palette consistently across all materials</p>'+
-    '</div>'+
-    '<div style=”background:#f5f5f7;border-radius:12px;padding:16px 20px”>'+
-    '<div style=”font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ff3b30;margin-bottom:8px”>Don\'t</div>'+
-    '<p style=”color:#86868b”>Distort or recolour the logo</p>'+
-    '<p style=”color:#86868b”>Use off-brand colours not in this guide</p>'+
-    '<p style=”color:#86868b”>Mix more than two typefaces in one layout</p>'+
-    '<p style=”color:#86868b”>Place the logo on a busy or low-contrast background</p>'+
-    '<p style=”color:#86868b”>Use body fonts below 13px in digital contexts</p>'+
-    '</div></div>';
-
-  const googleFonts = [hf,bf,ui].filter((v,i,a)=>a.indexOf(v)===i)
-    .map(f=>'family='+f.replace(/ /g,'+')+'&display=swap').join('&');
-
-  const doc = '<!DOCTYPE html><html><head><meta charset=”UTF-8”>'+
+  var doc = '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
     '<title>'+name+' — Brand Guidelines</title>'+
-    '<link href=”https://fonts.googleapis.com/css2?'+googleFonts+'” rel=”stylesheet”>'+
+    '<link href="https://fonts.googleapis.com/css2?'+gf+'&display=swap" rel="stylesheet">'+
     '<style>'+
-    '@page{margin:44px 52px;size:A4}'+
-    'body{font-family:”'+bf+'”,sans-serif;color:#1d1d1f;line-height:1.6;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
-    '.page{page-break-after:always;padding:8px 0 40px}'+
-    '.page:last-child{page-break-after:avoid}'+
-    'h1{font-family:”'+hf+'”,sans-serif;font-size:44px;font-weight:700;letter-spacing:-1px;margin:0 0 4px;color:#1d1d1f}'+
-    'h2{font-family:”'+hf+'”,sans-serif;font-size:20px;font-weight:700;margin:0 0 4px;letter-spacing:-0.2px;color:#1d1d1f}'+
-    '.section-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#86868b;margin-bottom:10px}'+
-    '.divider{height:1px;background:#e5e5e7;margin:24px 0}'+
-    'table{width:100%;border-collapse:collapse;font-size:12px}'+
-    'th{text-align:left;padding:7px 12px;background:#f5f5f7;font-weight:600;font-size:10px;letter-spacing:0.5px;text-transform:uppercase;color:#86868b}'+
-    'tr:nth-child(even){background:#fafafa}'+
-    '.accent-bar{height:4px;border-radius:2px;background:linear-gradient(90deg,'+c.primary+','+c.secondary+','+c.accent+');margin-bottom:32px}'+
-    '.footer{position:fixed;bottom:32px;left:52px;right:52px;font-size:9px;color:#86868b;display:flex;justify-content:space-between;border-top:1px solid #e5e5e7;padding-top:8px}'+
+    '*{box-sizing:border-box;margin:0;padding:0}'+
+    '@page{size:A4 landscape;margin:0}'+
+    'html,body{width:297mm;height:210mm;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-family:"'+bf+'",sans-serif;color:#1d1d1f;background:#fafafa}'+
+    '.wrap{display:flex;width:297mm;height:210mm}'+
+    '.left{width:86mm;background:'+c.primary+';padding:26px 22px;display:flex;flex-direction:column;flex-shrink:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
+    '.right{flex:1;padding:22px 24px;display:flex;flex-direction:column;overflow:hidden}'+
+    '.rg{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;overflow:hidden}'+
+    '.col{display:flex;flex-direction:column;gap:10px;overflow:hidden}'+
+    '.sec{background:#fff;border-radius:9px;border:1px solid #e8e8ed;padding:12px 14px;overflow:hidden}'+
+    '.stl{font-size:7.5px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:#6e6e73;margin-bottom:8px}'+
+    '.rule{height:1px;background:#f0f0f5;margin:7px 0}'+
     '</style></head><body>'+
+    '<div class="wrap">'+
 
-    // ── PAGE 1: Cover ──
-    '<div class=”page”>'+
-      '<div class=”accent-bar”></div>'+
-      (logoHTML ? '<div style=”margin-bottom:28px”>'+logoHTML+'</div>' : '')+
-      '<div class=”section-label”>Brand Guidelines</div>'+
-      '<h1>'+name+'</h1>'+
-      (tagline ? '<p style=”font-size:17px;color:#424245;margin:8px 0 32px”>”'+tagline+'”</p>' : '<div style=”margin-bottom:32px”></div>')+
-      (industry ? '<div style=”margin-bottom:16px”><div class=”section-label”>Industry</div><p style=”margin:0;font-size:14px;text-transform:capitalize”>'+industry+'</p></div>' : '')+
-      (arch ? '<div style=”margin-bottom:16px”><div class=”section-label”>Brand Archetype</div><p style=”margin:0;font-size:14px;font-weight:600;text-transform:capitalize”>'+arch+'</p></div>' : '')+
-      (traits.length ? '<div style=”margin-bottom:16px”><div class=”section-label”>Personality Traits</div><div style=”display:flex;gap:8px;flex-wrap:wrap;margin-top:4px”>'+traits.map(t=>'<span style=”padding:4px 14px;border:1.5px solid #1d1d1f;border-radius:20px;font-size:11px;font-weight:500”>'+t+'</span>').join('')+'</div></div>' : '')+
-      (selectedPair ? '<div style=”margin-top:16px”><div class=”section-label”>Font Pair</div><p style=”margin:0;font-size:13px”>'+selectedPair+'</p></div>' : '')+
-    '</div>'+
-
-    // ── PAGE 2: Colors ──
-    '<div class=”page”>'+
-      '<div class=”accent-bar”></div>'+
-      '<div class=”section-label”>Color System</div>'+
-      '<h2 style=”margin-bottom:20px”>Brand Colors</h2>'+
-      '<div style=”display:flex;flex-wrap:wrap;margin-top:4px”>'+colorItems+'</div>'+
-      paletteSection+
-      '<div class=”divider”></div>'+
-      '<div class=”section-label”>Color Usage</div>'+
-      '<table><thead><tr><th>Role</th><th>Color</th><th>Hex</th><th>Use For</th></tr></thead><tbody>'+
-      '<tr><td style=”padding:7px 12px”>Primary</td><td style=”padding:7px 12px”><div style=”width:20px;height:20px;border-radius:4px;background:'+c.primary+'”></div></td><td style=”padding:7px 12px;font-family:monospace”>'+c.primary+'</td><td style=”padding:7px 12px;color:#86868b”>Buttons, links, key actions</td></tr>'+
-      '<tr><td style=”padding:7px 12px”>Secondary</td><td style=”padding:7px 12px”><div style=”width:20px;height:20px;border-radius:4px;background:'+c.secondary+'”></div></td><td style=”padding:7px 12px;font-family:monospace”>'+c.secondary+'</td><td style=”padding:7px 12px;color:#86868b”>Supporting UI, hover states</td></tr>'+
-      '<tr><td style=”padding:7px 12px”>Accent</td><td style=”padding:7px 12px”><div style=”width:20px;height:20px;border-radius:4px;background:'+c.accent+'”></div></td><td style=”padding:7px 12px;font-family:monospace”>'+c.accent+'</td><td style=”padding:7px 12px;color:#86868b”>Highlights, badges, tags</td></tr>'+
-      '<tr><td style=”padding:7px 12px”>Background</td><td style=”padding:7px 12px”><div style=”width:20px;height:20px;border-radius:4px;background:'+c.bg+';border:1px solid #e5e5e7”></div></td><td style=”padding:7px 12px;font-family:monospace”>'+c.bg+'</td><td style=”padding:7px 12px;color:#86868b”>Page backgrounds</td></tr>'+
-      (c.text ? '<tr><td style=”padding:7px 12px”>Text</td><td style=”padding:7px 12px”><div style=”width:20px;height:20px;border-radius:4px;background:'+c.text+'”></div></td><td style=”padding:7px 12px;font-family:monospace”>'+c.text+'</td><td style=”padding:7px 12px;color:#86868b”>Body copy, UI text</td></tr>' : '')+
-      '</tbody></table>'+
-    '</div>'+
-
-    // ── PAGE 3: Typography ──
-    '<div class=”page”>'+
-      '<div class=”accent-bar”></div>'+
-      '<div class=”section-label”>Typography System</div>'+
-      '<h2 style=”margin-bottom:20px”>Typefaces</h2>'+
-      typoSection+
-      '<div class=”divider”></div>'+
-      '<div class=”section-label”>Type Scale</div>'+
-      '<table style=”margin-top:8px”><thead><tr><th>Level</th><th>Size / Weight</th><th>Tracking</th></tr></thead><tbody>'+typeScaleRows+'</tbody></table>'+
-    '</div>'+
-
-    // ── PAGE 4: Logo ──
-    (logoHTML ? '<div class=”page”>'+
-      '<div class=”accent-bar”></div>'+
-      '<div class=”section-label”>Logo</div>'+
-      '<h2 style=”margin-bottom:20px”>Logo System</h2>'+
-      '<div style=”display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px”>'+
-        '<div style=”background:#ffffff;border:1px solid #e5e5e7;border-radius:12px;padding:32px 40px;display:inline-flex;align-items:center;justify-content:center”>'+logoHTML+'</div>'+
-        '<div style=”background:#1d1d1f;border-radius:12px;padding:32px 40px;display:inline-flex;align-items:center;justify-content:center”>'+logoHTML+'</div>'+
-        '<div style=”background:'+c.primary+';border-radius:12px;padding:32px 40px;display:inline-flex;align-items:center;justify-content:center”>'+logoHTML+'</div>'+
+    // LEFT
+    '<div class="left">'+
+      '<div style="flex:1">'+
+        (logoHTML ? '<div style="margin-bottom:18px;background:rgba(255,255,255,.14);border-radius:9px;padding:12px 14px;display:inline-flex">'+logoHTML+'</div>' : '')+
+        '<div style="font-size:7px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:5px">Brand Guidelines</div>'+
+        '<div style="font-family:''+hf+'',sans-serif;font-size:26px;font-weight:700;color:#fff;line-height:1.1;letter-spacing:-.4px;margin-bottom:7px">'+name+'</div>'+
+        (tagline ? '<div style="font-size:10.5px;color:rgba(255,255,255,.65);line-height:1.5;margin-bottom:14px;font-style:italic">&#8220;'+tagline+'&#8221;</div>' : '<div style="margin-bottom:14px"></div>')+
+        '<div style="height:1px;background:rgba(255,255,255,.18);margin-bottom:14px"></div>'+
+        (arch ? '<div style="margin-bottom:10px"><div style="font-size:6.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:3px">Archetype</div><div style="font-size:11.5px;font-weight:600;color:#fff;text-transform:capitalize">'+arch+'</div></div>' : '')+
+        (industry ? '<div style="margin-bottom:10px"><div style="font-size:6.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:3px">Industry</div><div style="font-size:11px;color:rgba(255,255,255,.8);text-transform:capitalize">'+industry+'</div></div>' : '')+
+        (traits.length ? '<div><div style="font-size:6.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:5px">Personality</div>'+traitPills+'</div>' : '')+
       '</div>'+
-      '<div class=”divider”></div>'+
-      '<div class=”section-label”>Minimum Size &amp; Clear Space</div>'+
-      '<p style=”font-size:12px;color:#424245;margin:8px 0 0”>Minimum digital size: 32px height. Always maintain clear space equal to the cap-height of the wordmark around all sides.</p>'+
-    '</div>' : '')+
-
-    // ── PAGE 5: Usage Rules ──
-    '<div class=”page”>'+
-      '<div class=”accent-bar”></div>'+
-      '<div class=”section-label”>Usage Guidelines</div>'+
-      '<h2 style=”margin-bottom:20px”>Do\'s &amp; Don\'ts</h2>'+
-      usageSection+
-      (voiceText ? '<div class=”divider”></div><div class=”section-label”>Brand Voice &amp; Tone</div><p style=”font-size:12px;line-height:1.8;color:#424245;white-space:pre-wrap”>'+voiceText.slice(0,800)+'</p>' : '')+
+      '<div style="border-top:1px solid rgba(255,255,255,.18);padding-top:10px">'+
+        '<div style="font-size:7px;color:rgba(255,255,255,.38)">'+name+' · Brand Guide · '+new Date().getFullYear()+'</div>'+
+      '</div>'+
     '</div>'+
 
-    '<div class=”footer”><span>'+name+' — Brand Guidelines</span><span>Confidential · '+new Date().getFullYear()+'</span></div>'+
-    '</body></html>';
+    // RIGHT
+    '<div class="right">'+
+    '<div class="rg">'+
 
-  const win = window.open('', '_blank');
+    // COL 1
+    '<div class="col">'+
+      '<div class="sec">'+
+        '<div class="stl">Color System</div>'+
+        '<div style="display:flex;gap:5px">'+swatches+'</div>'+
+        palStrip+
+      '</div>'+
+      (logoHTML ?
+        '<div class="sec">'+
+          '<div class="stl">Logo Usage</div>'+
+          '<div style="display:flex;gap:5px">'+
+            '<div style="flex:1;background:#fff;border:1px solid #e8e8ed;border-radius:6px;padding:8px;display:flex;align-items:center;justify-content:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'+logoHTML+'</div>'+
+            '<div style="flex:1;background:#1d1d1f;border-radius:6px;padding:8px;display:flex;align-items:center;justify-content:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'+logoHTML+'</div>'+
+            '<div style="flex:1;background:'+c.primary+';border-radius:6px;padding:8px;display:flex;align-items:center;justify-content:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'+logoHTML+'</div>'+
+          '</div>'+
+          '<div style="font-size:7.5px;color:#aeaeb2;margin-top:5px">Light · Dark · Brand</div>'+
+        '</div>'
+      : '')+
+      '<div class="sec" style="flex:1">'+
+        '<div class="stl">Do's &amp; Don'ts</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:8.5px;line-height:1.75">'+
+          '<div>'+
+            '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#34c759;margin-bottom:4px">&#10003; Do</div>'+
+            '<div style="color:#424245;margin-bottom:2px">Use <b>'+c.primary+'</b> for actions</div>'+
+            '<div style="color:#424245;margin-bottom:2px">'+hf+' for all headings</div>'+
+            '<div style="color:#424245;margin-bottom:2px">Min 14px / 1.6 line-height</div>'+
+            '<div style="color:#424245">4.5:1 contrast ratio</div>'+
+          '</div>'+
+          '<div>'+
+            '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ff3b30;margin-bottom:4px">&#10005; Don't</div>'+
+            '<div style="color:#aeaeb2;margin-bottom:2px">Distort the logo</div>'+
+            '<div style="color:#aeaeb2;margin-bottom:2px">Use off-brand colours</div>'+
+            '<div style="color:#aeaeb2;margin-bottom:2px">Mix 3+ typefaces</div>'+
+            '<div style="color:#aeaeb2">Body text below 12px</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+
+    // COL 2
+    '<div class="col">'+
+      '<div class="sec">'+
+        '<div class="stl">Typography</div>'+
+        '<div style="margin-bottom:8px">'+
+          '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aeaeb2;margin-bottom:2px">Heading · '+hf+'</div>'+
+          '<div style="font-family:''+hf+'',sans-serif;font-size:20px;font-weight:700;color:#1d1d1f;line-height:1.1;letter-spacing:-.3px">'+name+'</div>'+
+          '<div style="font-family:''+hf+'',sans-serif;font-size:10px;color:#6e6e73;margin-top:2px">Aa Bb Cc 0 1 2 3 4 5</div>'+
+        '</div>'+
+        '<div class="rule"></div>'+
+        '<div style="margin-bottom:8px">'+
+          '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aeaeb2;margin-bottom:2px">Body · '+bf+'</div>'+
+          '<div style="font-family:''+bf+'',sans-serif;font-size:9.5px;line-height:1.65;color:#424245">Good design is honest and useful — always in service of the people who use it.</div>'+
+        '</div>'+
+        '<div class="rule"></div>'+
+        '<div>'+
+          '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aeaeb2;margin-bottom:2px">UI · '+ui+'</div>'+
+          '<div style="font-family:''+ui+'',sans-serif;font-size:8.5px;color:#6e6e73;letter-spacing:.2px">Button · Label · Nav · Caption</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="sec">'+
+        '<div class="stl">Type Scale</div>'+
+        '<div style="display:grid;grid-template-columns:auto 1fr auto;gap:3px 10px;align-items:baseline">'+
+          '<span style="font-family:''+hf+'',sans-serif;font-size:18px;font-weight:700;color:#1d1d1f;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">Display · 700</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">48–64px</span>'+
+          '<span style="font-family:''+hf+'',sans-serif;font-size:13px;font-weight:700;color:#1d1d1f;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">Heading · 700</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">28–40px</span>'+
+          '<span style="font-family:''+hf+'',sans-serif;font-size:10px;font-weight:600;color:#1d1d1f;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">Subheading · 600</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">18–24px</span>'+
+          '<span style="font-family:''+bf+'',sans-serif;font-size:8.5px;color:#424245;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">Body · 400</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">14–16px</span>'+
+          '<span style="font-family:''+ui+'',sans-serif;font-size:7.5px;color:#6e6e73;line-height:1">Aa</span><span style="font-size:8.5px;color:#6e6e73">UI Label · 500</span><span style="font-family:monospace;font-size:7.5px;color:#aeaeb2">11–13px</span>'+
+        '</div>'+
+      '</div>'+
+      (arch || BS._selectedPair || traits.length ?
+        '<div class="sec" style="flex:1">'+
+          '<div class="stl">Brand Identity</div>'+
+          (arch ? '<div style="margin-bottom:7px"><div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aeaeb2;margin-bottom:2px">Archetype</div><div style="font-size:11px;font-weight:600;text-transform:capitalize;color:#1d1d1f">'+arch+'</div></div>' : '')+
+          (BS._selectedPair ? '<div style="margin-bottom:7px"><div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aeaeb2;margin-bottom:2px">Font Pair</div><div style="font-size:9.5px;color:#424245">'+BS._selectedPair+'</div></div>' : '')+
+          (traits.length ? '<div><div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#aeaeb2;margin-bottom:4px">Personality</div><div>'+
+            traits.map(function(t){return '<span style="display:inline-block;padding:2px 7px;border:1px solid #e0e0e5;border-radius:20px;font-size:7.5px;font-weight:500;color:#424245;margin:2px 3px 2px 0">'+t+'</span>';}).join('')+
+          '</div></div>' : '')+
+        '</div>'
+      : '')+
+    '</div>'+
+
+    '</div></div>'+
+    '</div></body></html>';
+
+  var win = window.open('', '_blank');
   if (win) {
     win.document.write(doc);
     win.document.close();
@@ -1249,24 +1242,41 @@ function exportPDF() {
 }
 
 function buildPDFPreview() {
-  const area = document.getElementById('pdfPreviewArea');
+  var area = document.getElementById('pdfPreviewArea');
   if (!area) return;
-  const name    = BS.name    || 'Lumina';
-  const tagline = BS.tagline || 'Illuminate your world';
-  const c       = BS.colors;
+  var name    = BS.name    || 'Lumina';
+  var tagline = BS.tagline || 'Illuminate your world';
+  var c       = BS.colors;
+  var hf      = BS.fonts.heading || 'Space Grotesk';
+  var bf      = BS.fonts.body    || 'Inter';
+  var logoHTML = BS._uploadedLogoDataURL
+    ? '<img src="'+BS._uploadedLogoDataURL+'" style="max-height:36px;max-width:100px;object-fit:contain;display:block">'
+    : (BS._logoSVG || '');
 
-  area.innerHTML = '<div class=”pdf-preview”>' +
-    '<div style=”font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--txt3);margin-bottom:16px”>Preview</div>' +
-    '<h3>' + name + '</h3>' +
-    '<div class=”subtitle”>”' + tagline + '”</div>' +
-    '<div class=”pdf-section”><div class=”pdf-section-title”>Colors</div>' +
-    '<div style=”display:flex;gap:8px”>' +
-    Object.entries(c).slice(0, 4).map(function(e) {
-      return '<div style=”width:48px;height:48px;border-radius:8px;background:' + e[1] + ';box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08)”></div>';
-    }).join('') +
-    '</div></div>' +
-    '<div class=”pdf-section”><div class=”pdf-section-title”>Typography</div>' +
-    '<div style=”font-size:11px;color:var(--txt2)”>Heading: ' + BS.fonts.heading + ' · Body: ' + BS.fonts.body + '</div></div>' +
+  area.innerHTML =
+    '<div style="background:'+c.primary+';border-radius:10px;padding:16px 18px;display:flex;gap:14px;align-items:stretch;-webkit-print-color-adjust:exact;print-color-adjust:exact">'+
+      '<div style="flex-shrink:0;width:100px">'+
+        (logoHTML ? '<div style="background:rgba(255,255,255,.14);border-radius:7px;padding:8px;margin-bottom:8px;display:inline-flex">'+logoHTML+'</div>' : '')+
+        '<div style="font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:3px">Brand</div>'+
+        '<div style="font-family:''+hf+'',sans-serif;font-size:16px;font-weight:700;color:#fff;line-height:1.1;letter-spacing:-.3px;margin-bottom:4px">'+name+'</div>'+
+        (tagline ? '<div style="font-size:8px;color:rgba(255,255,255,.6);font-style:italic;line-height:1.4">“'+tagline+'”</div>' : '')+
+      '</div>'+
+      '<div style="flex:1;display:flex;flex-direction:column;gap:8px">'+
+        '<div style="background:#fff;border-radius:7px;padding:10px 12px">'+
+          '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6e6e73;margin-bottom:6px">Colors</div>'+
+          '<div style="display:flex;gap:5px">'+
+          Object.entries(c).slice(0,5).map(function(e){
+            return '<div style="flex:1"><div style="height:28px;border-radius:5px 5px 0 0;background:'+e[1]+';-webkit-print-color-adjust:exact;print-color-adjust:exact"></div>'+
+              '<div style="font-family:monospace;font-size:6.5px;color:#6e6e73;text-align:center;padding:2px 0">'+e[1]+'</div></div>';
+          }).join('')+
+          '</div>'+
+        '</div>'+
+        '<div style="background:#fff;border-radius:7px;padding:10px 12px">'+
+          '<div style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#6e6e73;margin-bottom:5px">Typography</div>'+
+          '<div style="font-family:''+hf+'',sans-serif;font-size:13px;font-weight:700;color:#1d1d1f;line-height:1;margin-bottom:3px">'+name+'</div>'+
+          '<div style="font-family:''+bf+'',sans-serif;font-size:8px;color:#6e6e73;line-height:1.5">'+hf+' &nbsp;·&nbsp; '+bf+'</div>'+
+        '</div>'+
+      '</div>'+
     '</div>';
 }
 </script>
