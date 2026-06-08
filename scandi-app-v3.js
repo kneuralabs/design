@@ -912,6 +912,29 @@ function renderTypeScale() {
 // ═══════════════════════════════════════════════════════
 // LIVE PREVIEW
 // ═══════════════════════════════════════════════════════
+
+// Returns a text color (light or dark) that contrasts well against bgHex
+function onBg(bgHex) {
+  try {
+    const r=parseInt(bgHex.slice(1,3),16)/255,g=parseInt(bgHex.slice(3,5),16)/255,b=parseInt(bgHex.slice(5,7),16)/255;
+    const toL=c=>c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4);
+    const lum=.2126*toL(r)+.7152*toL(g)+.0722*toL(b);
+    return lum > 0.35 ? '#1d1d1f' : '#f0eff8';
+  } catch(e) { return '#f0eff8'; }
+}
+
+// Always use a rich dark preview canvas so brand colors pop
+function previewCanvas() {
+  const bg = BS.colors.bg || '#0a0a0f';
+  try {
+    const r=parseInt(bg.slice(1,3),16)/255,g=parseInt(bg.slice(3,5),16)/255,b=parseInt(bg.slice(5,7),16)/255;
+    const toL=c=>c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4);
+    const lum=.2126*toL(r)+.7152*toL(g)+.0722*toL(b);
+    // If brand bg is light, use a near-black canvas so the preview always reads well
+    return lum > 0.35 ? '#0d0d18' : bg;
+  } catch(e) { return '#0d0d18'; }
+}
+
 function switchLivePrev(mode,el){
   document.querySelectorAll('#sec-preview .toggle-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
@@ -923,7 +946,7 @@ function renderLivePreview(mode) {
   const p = BS.colors.primary;
   const s = BS.colors.secondary||'#4ecdc4';
   const a = BS.colors.accent||'#d4a853';
-  const bg = BS.colors.bg||'#0a0a0f';
+  const bg = previewCanvas();
   const hf = `font-family:'${BS.fonts.heading}',sans-serif,serif`;
   const bf = `font-family:'${BS.fonts.body}',sans-serif,serif`;
   const name = BS.name||'Brand';
@@ -931,6 +954,13 @@ function renderLivePreview(mode) {
 
   const logoMark = getLogoMarkup(28);
   const isUpload = !!BS._uploadedLogoDataURL;
+  const txt = onBg(bg);
+  const txtMuted = txt === '#f0eff8' ? 'rgba(255,255,255,.5)' : 'rgba(0,0,0,.45)';
+  const txtFaint = txt === '#f0eff8' ? 'rgba(255,255,255,.3)' : 'rgba(0,0,0,.25)';
+  const navBorder = txt === '#f0eff8' ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)';
+  const cardBg = txt === '#f0eff8' ? 'rgba(255,255,255,.04)' : 'rgba(0,0,0,.04)';
+  const cardBorder = txt === '#f0eff8' ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.08)';
+  const secBtn = txt === '#f0eff8' ? 'rgba(255,255,255,.15)' : 'rgba(0,0,0,.12)';
   if(mode==='website') {
     wrap.innerHTML = `
       <div style="border-radius:16px;overflow:hidden;border:1px solid var(--c4)">
@@ -943,29 +973,29 @@ function renderLivePreview(mode) {
           </div>
         </div>
         <div style="background:${bg}">
-          <nav style="padding:14px 28px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:20px">
-            ${isUpload ? logoMark : `<span style="${hf};font-size:16px;font-weight:700;color:#f0eff8">${name}</span>`}
+          <nav style="padding:14px 28px;border-bottom:1px solid ${navBorder};display:flex;align-items:center;gap:20px">
+            ${isUpload ? logoMark : `<span style="${hf};font-size:16px;font-weight:700;color:${txt}">${name}</span>`}
             <div style="display:flex;gap:16px;margin-left:auto">
-              ${['Product','About','Pricing'].map(l=>`<span style="${bf};font-size:12px;color:rgba(255,255,255,.5);cursor:pointer">${l}</span>`).join('')}
-              <button style="background:${p};color:#fff;border:none;padding:6px 14px;border-radius:6px;${hf};font-size:12px;font-weight:600;cursor:pointer">Sign Up</button>
+              ${['Product','About','Pricing'].map(l=>`<span style="${bf};font-size:12px;color:${txtMuted};cursor:pointer">${l}</span>`).join('')}
+              <button style="background:${p};color:${onBg(p)};border:none;padding:6px 14px;border-radius:6px;${hf};font-size:12px;font-weight:600;cursor:pointer">Sign Up</button>
             </div>
           </nav>
           <div style="padding:60px 28px 40px">
             <div style="${hf};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${p};margin-bottom:12px">Now Available</div>
-            <h1 style="${hf};font-size:clamp(28px,4vw,52px);font-weight:700;color:#f0eff8;line-height:1.1;margin-bottom:16px">${tagline}</h1>
-            <p style="${bf};font-size:15px;color:rgba(255,255,255,.5);line-height:1.7;max-width:520px;margin-bottom:28px">Build powerful brand systems that scale. From identity to implementation, we've got you covered with professional tools.</p>
+            <h1 style="${hf};font-size:clamp(28px,4vw,52px);font-weight:700;color:${txt};line-height:1.1;margin-bottom:16px">${tagline}</h1>
+            <p style="${bf};font-size:15px;color:${txtMuted};line-height:1.7;max-width:520px;margin-bottom:28px">Build powerful brand systems that scale. From identity to implementation, we've got you covered with professional tools.</p>
             <div style="display:flex;gap:12px;margin-bottom:48px;flex-wrap:wrap">
-              <button style="background:${p};color:#fff;border:none;padding:13px 26px;border-radius:8px;${hf};font-weight:600;font-size:14px;cursor:pointer">Start Building →</button>
-              <button style="background:transparent;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);padding:13px 26px;border-radius:8px;${bf};font-size:14px;cursor:pointer">Watch Demo</button>
+              <button style="background:${p};color:${onBg(p)};border:none;padding:13px 26px;border-radius:8px;${hf};font-weight:600;font-size:14px;cursor:pointer">Start Building →</button>
+              <button style="background:transparent;color:${txtMuted};border:1px solid ${secBtn};padding:13px 26px;border-radius:8px;${bf};font-size:14px;cursor:pointer">Watch Demo</button>
             </div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
               ${[[p,'Identity'],[s,'Palette'],[a,'Typography']].map(([c,t])=>`
-                <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:18px">
-                  <div style="width:36px;height:36px;border-radius:8px;background:${c}22;display:flex;align-items:center;justify-content:center;margin-bottom:10px">
+                <div style="background:${cardBg};border:1px solid ${cardBorder};border-radius:10px;padding:18px">
+                  <div style="width:36px;height:36px;border-radius:8px;background:${c}33;display:flex;align-items:center;justify-content:center;margin-bottom:10px">
                     <div style="width:16px;height:16px;border-radius:4px;background:${c}"></div>
                   </div>
-                  <div style="${hf};font-size:14px;font-weight:600;color:#f0eff8;margin-bottom:4px">${t}</div>
-                  <div style="${bf};font-size:12px;color:rgba(255,255,255,.4);line-height:1.5">Professional grade tools</div>
+                  <div style="${hf};font-size:14px;font-weight:600;color:${txt};margin-bottom:4px">${t}</div>
+                  <div style="${bf};font-size:12px;color:${txtMuted};line-height:1.5">Professional grade tools</div>
                 </div>
               `).join('')}
             </div>
@@ -977,16 +1007,16 @@ function renderLivePreview(mode) {
       <div style="display:flex;justify-content:center;padding:10px 0">
         <div style="width:320px;background:${bg};border-radius:28px;border:8px solid var(--c4);overflow:hidden">
           <div style="height:28px;background:${bg};display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px">
-            <div style="width:80px;height:5px;background:var(--c4);border-radius:3px"></div>
+            <div style="width:80px;height:5px;background:${cardBg};border-radius:3px"></div>
           </div>
           <div style="padding:16px 16px 24px">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
               <div style="width:36px;height:36px;border-radius:10px;background:${isUpload?'transparent':p};display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
-                ${isUpload ? getLogoMarkup(28) : `<span style="${hf};font-size:16px;font-weight:700;color:#fff">${name[0]}</span>`}
+                ${isUpload ? getLogoMarkup(28) : `<span style="${hf};font-size:16px;font-weight:700;color:${onBg(p)}">${name[0]}</span>`}
               </div>
               <div>
-                <div style="${hf};font-size:14px;font-weight:600;color:#f0eff8">${name}</div>
-                <div style="${bf};font-size:11px;color:rgba(255,255,255,.4)">Dashboard</div>
+                <div style="${hf};font-size:14px;font-weight:600;color:${txt}">${name}</div>
+                <div style="${bf};font-size:11px;color:${txtMuted}">Dashboard</div>
               </div>
             </div>
             <div style="background:linear-gradient(135deg,${p},${s});border-radius:14px;padding:18px;margin-bottom:14px">
@@ -995,35 +1025,36 @@ function renderLivePreview(mode) {
               <div style="${bf};font-size:11px;color:rgba(255,255,255,.6);margin-top:6px">↑ 24% this month</div>
             </div>
             ${['Campaigns','Analytics','Reports'].map((item,i)=>`
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.04);border-radius:10px;margin-bottom:8px">
-                <div style="width:28px;height:28px;border-radius:7px;background:${[p,s,a][i]}22;display:flex;align-items:center;justify-content:center">
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:${cardBg};border-radius:10px;margin-bottom:8px">
+                <div style="width:28px;height:28px;border-radius:7px;background:${[p,s,a][i]}33;display:flex;align-items:center;justify-content:center">
                   <div style="width:10px;height:10px;border-radius:2px;background:${[p,s,a][i]}"></div>
                 </div>
-                <span style="${hf};font-size:13px;font-weight:500;color:#f0eff8">${item}</span>
-                <span style="${bf};font-size:11px;color:rgba(255,255,255,.3);margin-left:auto">→</span>
+                <span style="${hf};font-size:13px;font-weight:500;color:${txt}">${item}</span>
+                <span style="${bf};font-size:11px;color:${txtFaint};margin-left:auto">→</span>
               </div>
             `).join('')}
           </div>
         </div>
       </div>`;
   } else if(mode==='social') {
+    const pTxt = onBg(p);
     wrap.innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:600px;margin:0 auto">
-        <div style="aspect-ratio:1;background:${bg};border-radius:14px;overflow:hidden;padding:20px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid var(--c4);position:relative">
+        <div style="aspect-ratio:1;background:${bg};border-radius:14px;overflow:hidden;padding:20px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid ${cardBorder};position:relative">
           <div style="position:absolute;top:0;right:0;width:100px;height:100px;background:${p};border-radius:0 14px 0 100%"></div>
           <div style="${hf};font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${p};margin-bottom:6px">${name}</div>
-          <div style="${hf};font-size:18px;font-weight:700;color:#f0eff8;line-height:1.2">${tagline}</div>
+          <div style="${hf};font-size:18px;font-weight:700;color:${txt};line-height:1.2">${tagline}</div>
         </div>
         <div style="aspect-ratio:1;background:${p};border-radius:14px;overflow:hidden;padding:20px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
-          ${isUpload ? `<div style="max-height:60px;margin-bottom:8px">${getLogoMarkup(56)}</div>` : `<div style="${hf};font-size:32px;font-weight:700;color:#fff;line-height:1">${name[0]}</div>`}
-          <div style="${hf};font-size:14px;font-weight:600;color:rgba(255,255,255,.9);margin-top:8px">${name}</div>
-          <div style="${bf};font-size:11px;color:rgba(255,255,255,.6);margin-top:4px">${BS.industry||'Brand'}</div>
+          ${isUpload ? `<div style="max-height:60px;margin-bottom:8px">${getLogoMarkup(56)}</div>` : `<div style="${hf};font-size:32px;font-weight:700;color:${pTxt};line-height:1">${name[0]}</div>`}
+          <div style="${hf};font-size:14px;font-weight:600;color:${pTxt};opacity:.9;margin-top:8px">${name}</div>
+          <div style="${bf};font-size:11px;color:${pTxt};opacity:.6;margin-top:4px">${BS.industry||'Brand'}</div>
         </div>
-        <div style="aspect-ratio:2/1;grid-column:1/-1;background:linear-gradient(135deg,${bg},${p}22);border-radius:14px;padding:20px;display:flex;align-items:center;gap:20px;border:1px solid rgba(255,255,255,.08)">
+        <div style="aspect-ratio:2/1;grid-column:1/-1;background:linear-gradient(135deg,${bg},${p}22);border-radius:14px;padding:20px;display:flex;align-items:center;gap:20px;border:1px solid ${cardBorder}">
           <div style="width:48px;height:48px;border-radius:12px;background:${isUpload?'transparent':p};flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center">${isUpload?getLogoMarkup(44):''}</div>
           <div>
-            <div style="${hf};font-size:16px;font-weight:700;color:#f0eff8">${tagline}</div>
-            <div style="${bf};font-size:12px;color:rgba(255,255,255,.4);margin-top:3px">Brand Story · ${name}</div>
+            <div style="${hf};font-size:16px;font-weight:700;color:${txt}">${tagline}</div>
+            <div style="${bf};font-size:12px;color:${txtMuted};margin-top:3px">Brand Story · ${name}</div>
           </div>
         </div>
       </div>`;
@@ -1035,12 +1066,12 @@ function renderLivePreview(mode) {
           <div>
             ${isUpload ? `<div style="margin-bottom:16px">${getLogoMarkup(36)}</div>` : ''}
             <div style="${hf};font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:${p};margin-bottom:12px">COMPANY OVERVIEW</div>
-            <h1 style="${hf};font-size:clamp(20px,3vw,42px);font-weight:700;color:#f0eff8;line-height:1.15;margin-bottom:14px">${name}<br><span style="color:${p}">${tagline}</span></h1>
-            <p style="${bf};font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;max-width:400px">Transforming how brands are built and experienced. Professional tools for the modern creative team.</p>
+            <h1 style="${hf};font-size:clamp(20px,3vw,42px);font-weight:700;color:${txt};line-height:1.15;margin-bottom:14px">${name}<br><span style="color:${p}">${tagline}</span></h1>
+            <p style="${bf};font-size:13px;color:${txtMuted};line-height:1.6;max-width:400px">Transforming how brands are built and experienced. Professional tools for the modern creative team.</p>
           </div>
         </div>
-        <div style="padding:14px 40px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center">
-          <span style="${hf};font-size:11px;font-weight:600;color:rgba(255,255,255,.3)">${name} · Brand Presentation</span>
+        <div style="padding:14px 40px;border-top:1px solid ${navBorder};display:flex;justify-content:space-between;align-items:center">
+          <span style="${hf};font-size:11px;font-weight:600;color:${txtFaint}">${name} · Brand Presentation</span>
           <div style="display:flex;gap:6px">
             ${[p,s,a].map(c=>`<div style="width:20px;height:3px;border-radius:2px;background:${c}"></div>`).join('')}
           </div>
