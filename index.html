@@ -676,7 +676,23 @@ textarea { resize: vertical; min-height: 88px; }
       </div>
     </div>
 
-    <div class="card">
+    <div id="guidelineOutput" style="display:none">
+      <div class="card">
+        <div class="card-title">Your Brand Guide</div>
+        <div id="guidelineContent"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PALETTE ─── -->
+<section class="section" id="sec-palette">
+  <div class="page-head">
+    <h2>Colors</h2>
+    <p>Build and refine your brand's color palette</p>
+  </div>
+  <div class="content-wrap">
+    <div class="card" style="margin-bottom:16px">
       <div class="card-title">Your Colors</div>
       <div class="grid-4">
         <div>
@@ -701,23 +717,6 @@ textarea { resize: vertical; min-height: 88px; }
         <button class="btn btn-ghost btn-sm" onclick="generateGuidelines()">Create Brand Guide</button>
       </div>
     </div>
-
-    <div id="guidelineOutput" style="display:none">
-      <div class="card">
-        <div class="card-title">Your Brand Guide</div>
-        <div id="guidelineContent"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─── PALETTE ─── -->
-<section class="section" id="sec-palette">
-  <div class="page-head">
-    <h2>Colors</h2>
-    <p>Build and refine your brand's color palette</p>
-  </div>
-  <div class="content-wrap">
     <div class="tabs" id="paletteTabs">
       <div class="tab active" onclick="switchTab('paletteTabs','palPanel',0,this)">Create</div>
       <div class="tab" onclick="switchTab('paletteTabs','palPanel',1,this)">Check Colors</div>
