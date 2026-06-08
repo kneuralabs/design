@@ -108,9 +108,52 @@ function showSection(id, el) {
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
   el.classList.add('active');
-  if(id==='preview') renderLivePreview('website');
+  if(id==='preview') {
+    renderLivePreview('website');
+    renderBrandSummary();
+    markDone('preview');
+  }
   if(id==='export') { buildExports(); if(typeof buildPDFPreview==='function') buildPDFPreview(); }
   if(id==='logo') initLogoSection();
+}
+
+function nextStep(id) {
+  const nav = document.querySelector('.nav-item[data-sec="'+id+'"]');
+  if (nav) showSection(id, nav);
+}
+
+function markDone(sectionId) {
+  const nav = document.querySelector('.nav-item[data-sec="'+sectionId+'"]');
+  if (nav) nav.classList.add('done');
+}
+
+function renderBrandSummary() {
+  const bar = document.getElementById('brandSummaryBar');
+  if (!bar) return;
+  const name = BS.name || 'Brand';
+  const tagline = BS.tagline || '';
+  const hf = BS.fonts.heading || 'Space Grotesk';
+  const bf = BS.fonts.body || 'Inter';
+  const p = BS.colors.primary || '#7c6dff';
+  const s = BS.colors.secondary || '#4ecdc4';
+  const a = BS.colors.accent || '#d4a853';
+  bar.style.display = 'block';
+  bar.innerHTML = `
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'${hf}',sans-serif;font-size:20px;font-weight:700;color:var(--txt1);letter-spacing:-.3px;line-height:1.2">${name}</div>
+        ${tagline ? `<div style="font-family:'${bf}',sans-serif;font-size:13px;color:var(--txt3);margin-top:3px;font-style:italic">${tagline}</div>` : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <div style="width:28px;height:28px;border-radius:50%;background:${p};box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)" title="Primary: ${p}"></div>
+        <div style="width:28px;height:28px;border-radius:50%;background:${s};box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)" title="Secondary: ${s}"></div>
+        <div style="width:28px;height:28px;border-radius:50%;background:${a};box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)" title="Accent: ${a}"></div>
+      </div>
+      <div style="font-size:12px;color:var(--txt3);flex-shrink:0">
+        Heading: <strong style="color:var(--txt2)">${hf}</strong> &nbsp;·&nbsp; Body: <strong style="color:var(--txt2)">${bf}</strong>
+      </div>
+    </div>
+  `;
 }
 
 function switchTab(tabGroup, panelPrefix, idx, el) {
@@ -197,6 +240,7 @@ function syncBrand() {
   BS.name    = document.getElementById('brandName').value    || 'Lumina';
   BS.tagline = document.getElementById('brandTagline').value || 'Illuminate your world';
   BS.desc    = document.getElementById('brandDesc').value    || '';
+  if (document.getElementById('brandName').value) markDone('brand');
 }
 
 document.getElementById('brandIndustry').addEventListener('change', function(){
@@ -257,6 +301,7 @@ function autoRecommend() {
     if(el){ el.value=pal[i]; el.dispatchEvent(new Event('input')); }
   });
   BS.colors.primary=primary; BS.colors.secondary=secondary; BS.colors.accent=accent; BS.colors.bg=bg;
+  markDone('palette');
   showToast('Colors suggested! Adjust or hit Create Brand Guide.');
 }
 
@@ -302,6 +347,7 @@ function generateGuidelines() {
   document.getElementById('guidelineContent').innerHTML = html;
   out.style.display = 'block';
   out.scrollIntoView({behavior:'smooth',block:'nearest'});
+  markDone('brand');
   showToast('Guidelines generated!');
 }
 
@@ -375,6 +421,7 @@ function applyToBrand() {
   if(BS.palette[0]) { document.getElementById('cprimary').value=BS.palette[0]; BS.colors.primary=BS.palette[0]; }
   if(BS.palette[1]) { document.getElementById('csecondary').value=BS.palette[1]; BS.colors.secondary=BS.palette[1]; }
   if(BS.palette[2]) { document.getElementById('caccent').value=BS.palette[2]; BS.colors.accent=BS.palette[2]; }
+  markDone('palette');
   showToast('Palette applied to brand!');
   buildExports();
 }
@@ -550,11 +597,14 @@ function updateTypoPrev() {
   BS.fonts.heading = document.getElementById('selHeading').value;
   BS.fonts.body    = document.getElementById('selBody').value;
   BS.fonts.ui      = document.getElementById('selUI').value;
-  renderTypoPreview(document.querySelector('#prevToggle .toggle-btn.active')?.dataset?.mode || 'website');
+  const activeToggle = document.querySelector('#typePanel2 #prevToggle .toggle-btn.active') ||
+                       document.querySelector('#prevToggle .toggle-btn.active');
+  renderTypoPreview(activeToggle?.dataset?.mode || 'website');
   renderCompare();
   renderHealthScore();
   renderAIAdvisor();
   renderTypeScale();
+  markDone('typography');
   // buildExports is deferred to when the user navigates to the Export section
 }
 
@@ -591,13 +641,16 @@ function applyPairing(idx) {
   document.getElementById('selBody').value = p.b;
   document.getElementById('selUI').value = p.ui;
   BS._selectedPair = p.label ? `${p.label} — ${p.h} + ${p.b}` : `${p.h} + ${p.b}`;
+  markDone('typography');
   updateTypoPrev();
   showToast(`Applied: ${p.h} + ${p.b}`);
 }
 
 let prevMode='website';
 function switchPrevMode(mode,el){
-  document.querySelectorAll('#prevToggle .toggle-btn').forEach(b=>b.classList.remove('active'));
+  const panel = document.getElementById('typePanel2');
+  const container = panel ? panel.querySelectorAll('#prevToggle .toggle-btn') : document.querySelectorAll('#prevToggle .toggle-btn');
+  container.forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   el.dataset.mode=mode;
   prevMode=mode;
@@ -1184,7 +1237,7 @@ function renderLogoPreview() {
       <div style="background:${BS.colors.primary};border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${img}</div>
     `;
     renderStationeryMockup();
-    renderBrandObjects(_lastBrandObj);
+    markDone('logo');
     return;
   }
   const svg = getLogoSVG();
@@ -1195,7 +1248,7 @@ function renderLogoPreview() {
     <div style="background:${BS.colors.primary};border-radius:12px;padding:24px 28px;box-shadow:var(--shadow-card);display:inline-flex;align-items:center;justify-content:center;min-width:100px">${svg.replace(/fill="(?!none")[^"]*"/g, 'fill="#fff"').replace(/stroke="(?!none")[^"]*"/g, 'stroke="#fff"')}</div>
   `;
   renderStationeryMockup();
-  renderBrandObjects(_lastBrandObj);
+  markDone('logo');
 }
 
 function handleLogoUpload(input) {
