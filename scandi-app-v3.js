@@ -2,7 +2,8 @@
 // DARK MODE TOGGLE
 // ═══════════════════════════════════════════════════════
 function initTheme() {
-  const saved = localStorage.getItem('ds-theme');
+  let saved = null;
+  try { saved = localStorage.getItem('ds-theme'); } catch (e) { /* storage unavailable */ }
   if (saved === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
   }
@@ -19,7 +20,7 @@ function toggleTheme() {
   } else {
     html.removeAttribute('data-theme');
   }
-  localStorage.setItem('ds-theme', next);
+  try { localStorage.setItem('ds-theme', next); } catch (e) { /* storage unavailable */ }
   updateToggleIcon();
   setTimeout(() => html.classList.remove('theme-transitioning'), 350);
 }
